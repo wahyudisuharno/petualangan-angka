@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Petualangan Angka</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap">
+<style>
+:root{--bg:#eef0ff;--panel:#fff;--ink:#1b1740;--soft:#6a66a0;--line:#d6d9f7;--sun:#ffc400;--mint:#14b87a;--coral:#ef4560;--btn:#4b3fd1;--btnink:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1740;--panel:#2a2563;--ink:#fff;--soft:#b4b0ee;--line:#40399a;--btn:#ffd23f;--btnink:#1b1740;--mint:#3ddc97;--coral:#ff6b81}}
+:root[data-theme="dark"]{--bg:#1b1740;--panel:#2a2563;--ink:#fff;--soft:#b4b0ee;--line:#40399a;--btn:#ffd23f;--btnink:#1b1740;--mint:#3ddc97;--coral:#ff6b81}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif;font-weight:500}
+#app{max-width:520px;margin:0 auto;padding:16px}
+h1{font-size:2.1rem;font-weight:800;margin:8px 0 0;line-height:1.05}
+h2{font-size:1.2rem;margin:16px 0 6px}
+p{margin:6px 0;line-height:1.35}
+.soft{color:var(--soft)}
+button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:16px;color:var(--ink);background:var(--panel);box-shadow:0 3px 0 var(--line);touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+button:active{transform:translateY(2px);box-shadow:none}
+.go{background:var(--btn);color:var(--btnink);box-shadow:0 4px 0 rgba(0,0,0,.25);padding:12px 22px;font-size:1.15rem}
+.tabs{display:flex;gap:6px;margin:12px 0 4px}
+.tab{flex:1;padding:8px 0;font-size:1.05rem}
+.tab b{display:block;font-size:1.5rem;line-height:1.1}
+.tab.on{background:var(--btn);color:var(--btnink)}
+.lv{display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px 16px;margin:8px 0;font-size:1.1rem;text-align:left}
+.lv small{display:block;font-weight:500;color:var(--soft)}
+.shelf{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.slot{width:48px;height:48px;border-radius:14px;background:var(--panel);display:grid;place-items:center;font-size:1.8rem;border:2px dashed var(--line)}
+.slot.on{border:2px solid var(--sun)}
+.slot.off{filter:grayscale(1) brightness(.6);opacity:.4}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.top button{padding:6px 12px}
+.hearts{font-size:1.4rem;letter-spacing:2px}
+.arena{position:relative;background:var(--panel);border-radius:24px;text-align:center;padding:14px 10px 10px;margin:10px 0;border:2px solid var(--line);overflow:hidden}
+.arena.shake{animation:shake .4s}
+.mon{font-size:5.5rem;line-height:1.1;display:inline-block;animation:bob 2.2s ease-in-out infinite}
+.mon.hit{animation:hit .5s}
+.mon.win{animation:win .8s forwards}
+.fx{position:absolute;left:50%;top:42%;font-size:1.8rem;pointer-events:none;animation:fx .7s forwards}
+.cf{position:fixed;top:-30px;font-size:1.6rem;pointer-events:none;animation:fall 2.4s linear forwards;z-index:9}
+@keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes hit{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-6deg)}60%{transform:translateX(14px) rotate(6deg)}}
+@keyframes win{to{transform:scale(0) rotate(240deg);opacity:0}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes fx{to{transform:translate(var(--dx),var(--dy)) scale(1.4);opacity:0}}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important}}
+.bar,.meter{height:14px;background:var(--line);border-radius:9px;overflow:hidden;margin:4px 0}
+.bar{max-width:260px;margin:4px auto}
+.bar i{display:block;height:100%;background:var(--coral);transition:width .4s}
+.meter i{display:block;height:100%;background:var(--mint)}
+.q{font-size:2.4rem;font-weight:800;margin:12px 0 4px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.opts button{font-size:1.8rem;padding:16px 0}
+.opts button.ok{background:var(--mint);color:#06281b}
+.opts button.no{background:var(--coral);color:#fff}
+.fb{border-radius:18px;padding:12px 14px;margin:10px 0;background:var(--panel);border:2px solid var(--line)}
+.fb b{display:block;font-size:1.15rem}
+.center{text-align:center}
+input{font:inherit;font-size:2rem;text-align:center;letter-spacing:8px;width:140px;padding:8px;border-radius:14px;border:2px solid var(--line);background:var(--panel);color:var(--ink)}
+.card{background:var(--panel);border-radius:18px;padding:10px 14px;margin:8px 0;border:2px solid var(--line)}
+.week{display:flex;align-items:flex-end;gap:6px;height:100px}
+.week div{flex:1;text-align:center;font-size:.8rem;color:var(--soft)}
+.week i{display:block;background:var(--btn);border-radius:6px 6px 0 0;min-height:3px}
+.row{display:flex;justify-content:space-between;gap:8px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var OPS=[
+ {k:"mul",n:"Kali",s:"×",lv:["Tabel 2–5","Tabel 6–9","Campuran 2–10"]},
+ {k:"add",n:"Tambah",s:"+",lv:["Sampai 30","Dua angka","Ratusan"]},
+ {k:"sub",n:"Kurang",s:"−",lv:["Dalam 20","Dua angka","Ratusan"]},
+ {k:"div",n:"Bagi",s:"÷",lv:["Bagi 2–5","Bagi 2–9","Bagi 2–10"]}];
+var R={mul:[[2,5,2,5],[6,9,2,9],[2,10,2,10]],add:[[3,15,3,15],[12,89,12,89],[101,499,101,499]],
+ sub:[[8,20,2,9],[30,99,11,29],[200,600,101,199]],div:[[2,5,2,5],[2,9,2,9],[2,10,3,12]]};
+var LVN=["Pemula","Petualang","Pahlawan"];
+var POOL=["👾","🐸","🦑","🐲","🦂","🧟","👹","🐙","🦖","🦇","🐍","🦈","🐊","🦀","🐛","🦎","🐗","🦅","🐺","🦉","🐻","🦍","🦏","🐘","🦁","🐅","🐆","🦒","🦛","🐡","🐌","🦟","🪲","🐢","🦜","🐿"];
+var app=document.getElementById("app");
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var MUTE=ld("pa-mute",false),ST=ld("pa-stat",{ops:{},days:{},wrong:{}});
+var S={op:0,lv:0,mi:0,mhp:3,hp:5,q:null,weak:[],busy:false,got:ld("pa-koleksi",[])};
+function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(x){for(var i=x.length-1;i>0;i--){var j=rnd(0,i),t=x[i];x[i]=x[j];x[j]=t}return x}
+function monE(){return POOL[S.op*9+S.lv*3+S.mi]}
+function dk(d){return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+
+/* ---------- suara (disintesis, tanpa file) ---------- */
+var AC=null;
+function tone(f,d,type){var o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+d;o.type=type;o.frequency.value=f;
+ g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.18,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+.2);
+ o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+.22)}
+function snd(t){if(MUTE)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();
+ var q={ok:[[660,0],[880,.09],[1175,.18]],no:[[240,0],[170,.13]],win:[[523,0],[659,.12],[784,.24],[1047,.36]],tap:[[520,0]]}[t];
+ q.forEach(function(n){tone(n[0],n[1],t==="no"?"sawtooth":"triangle")})}catch(e){}}
+
+/* ---------- animasi ---------- */
+function burst(){var a=document.getElementById("arena");if(!a)return;
+ ["⚔️","💥","✨","⭐","💥","✨"].forEach(function(e){var s=document.createElement("span");s.className="fx";s.textContent=e;
+  s.style.setProperty("--dx",rnd(-100,100)+"px");s.style.setProperty("--dy",rnd(-90,-10)+"px");a.appendChild(s);setTimeout(function(){s.remove()},750)})}
+function confetti(){for(var i=0;i<28;i++){var s=document.createElement("span");s.className="cf";s.textContent=["🎉","🎊","⭐","✨"][i%4];
+ s.style.left=rnd(0,95)+"vw";s.style.animationDelay=(Math.random()*.8)+"s";document.body.appendChild(s);setTimeout(function(x){x.remove()},3400,s)}}
+
+/* ---------- soal ---------- */
+function mk(k,x,y,m){var t,a;
+ if(k==="mul"){t=m?x+" × ? = "+x*y:x+" × "+y+" = ?";a=m?y:x*y}
+ else if(k==="add"){t=m?x+" + ? = "+(x+y):x+" + "+y+" = ?";a=m?y:x+y}
+ else if(k==="sub"){t=m?x+" − ? = "+(x-y):x+" − "+y+" = ?";a=m?y:x-y}
+ else{t=m?x*y+" ÷ ? = "+y:x*y+" ÷ "+x+" = ?";a=m?x:y}
+ var c=[a+1,a-1,a+2,a-2,a+10,a-10];
+ if(k==="mul"&&!m)c=[a+x,a-x,a+y,a-y,a+1,a-1];
+ c=c.filter(function(v,i){return v>0&&v!==a&&c.indexOf(v)===i});
+ return{k:k,x:x,y:y,ans:a,text:t,opts:shuffle([a].concat(shuffle(c).slice(0,3)))}}
+function gen(){var k=OPS[S.op].k,r=R[k][S.lv],x,y;
+ if(S.weak.length&&Math.random()<.4){var w=S.weak[rnd(0,S.weak.length-1)];x=w[0];y=w[1]}
+ else{x=rnd(r[0],r[1]);y=rnd(r[2],r[3])}
+ return mk(k,x,y,Math.random()<.5)}
+function expl(q){var k=q.k,x=q.x,y=q.y,s;
+ if(k==="mul")return x+" × "+y+" berarti "+y+" kelompok berisi "+x+":<br>"+Array(y+1).join(x+" + ").slice(0,-3)+" = "+x*y;
+ if(k==="add"){s=x+y;var bt=y-y%10,bo=y%10;
+  return bt&&bo?x+" + "+bt+" = "+(x+bt)+", lalu "+(x+bt)+" + "+bo+" = "+s:"Hitung maju "+y+" langkah dari "+x+":<br>"+x+" + "+y+" = "+s}
+ if(k==="sub"){s=x-y;var ct=y-y%10,co=y%10;
+  return ct&&co?x+" − "+ct+" = "+(x-ct)+", lalu "+(x-ct)+" − "+co+" = "+s:"Hitung mundur "+y+" langkah dari "+x+":<br>"+x+" − "+y+" = "+s}
+ return "Pikirkan: "+x+" × ? = "+x*y+".<br>Ternyata "+x+" × "+y+" = "+x*y+", jadi "+x*y+" ÷ "+x+" = "+y}
+function lab(key){var p=key.split(":"),x=+p[1],y=+p[2];
+ return {mul:x+" × "+y,add:x+" + "+y,sub:x+" − "+y,div:x*y+" ÷ "+x}[p[0]]}
+function rec(q,ok){var o=ST.ops[q.k]=ST.ops[q.k]||[0,0],d=dk(new Date());o[0]++;if(ok)o[1]++;
+ ST.days[d]=(ST.days[d]||0)+1;if(!ok){var key=q.k+":"+q.x+":"+q.y;ST.wrong[key]=(ST.wrong[key]||0)+1}sv("pa-stat",ST)}
+
+/* ---------- menu ---------- */
+function menu(){var o=OPS[S.op];
+ var shelf=[0,1,2,3,4,5,6,7,8].map(function(i){var e=POOL[S.op*9+i],on=S.got.indexOf(e)>-1;return '<div class="slot '+(on?'on':'off')+'">'+e+'</div>'}).join("");
+ var n=S.got.filter(function(e){var i=POOL.indexOf(e);return i>=S.op*9&&i<S.op*9+9}).length;
+ app.innerHTML='<div class="top"><h1>Petualangan Angka</h1><span><button id="mu" aria-label="Suara">'+(MUTE?"🔇":"🔊")+'</button> <button id="pr">👨‍👩‍👧 Orang tua</button></span></div>'+
+ '<p class="soft">Monster takut pada hitungan. Jawab dengan benar untuk menyerang!</p>'+
+ '<div class="tabs">'+OPS.map(function(p,i){return '<button class="tab'+(i===S.op?' on':'')+'" data-op="'+i+'"><b>'+p.s+'</b>'+p.n+'</button>'}).join("")+'</div>'+
+ o.lv.map(function(d,i){return '<button class="lv" data-lv="'+i+'"><span>'+LVN[i]+'<small>'+d+'</small></span><span>⚔️</span></button>'}).join("")+
+ '<p><b>Koleksi monster '+o.n+'</b> <span class="soft">('+n+'/9)</span></p><div class="shelf">'+shelf+'</div>';
+ document.getElementById("mu").onclick=function(){MUTE=!MUTE;sv("pa-mute",MUTE);snd("tap");menu()};
+ document.getElementById("pr").onclick=parent;
+ app.querySelectorAll("[data-op]").forEach(function(b){b.onclick=function(){S.op=+b.dataset.op;snd("tap");menu()}});
+ app.querySelectorAll("[data-lv]").forEach(function(b){b.onclick=function(){snd("tap");start(+b.dataset.lv)}});
+}
+
+/* ---------- pertarungan ---------- */
+function start(l){S.lv=l;S.mi=0;S.hp=5;S.weak=[];monster()}
+function monster(){S.mhp=3;next()}
+function next(){S.q=gen();S.busy=false;battle("")}
+function battle(fb){var q=S.q;
+ app.innerHTML='<div class="top"><button id="x">← Menu</button><span class="soft">Monster '+(S.mi+1)+'/3</span><span class="hearts" aria-label="Nyawa '+S.hp+'">'+"❤️".repeat(S.hp)+"🖤".repeat(5-S.hp)+'</span></div>'+
+ '<div class="arena" id="arena"><div class="mon" id="mon">'+monE()+'</div><div><b>Monster '+OPS[S.op].n+' '+(S.mi+1)+'</b></div><div class="bar"><i style="width:'+(S.mhp/3*100)+'%"></i></div>'+
+ '<div class="q">'+q.text+'</div></div>'+
+ '<div class="opts">'+q.opts.map(function(v){return '<button data-v="'+v+'">'+v+'</button>'}).join("")+'</div><div id="fb">'+fb+'</div>';
+ document.getElementById("x").onclick=menu;
+ app.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){pick(b)}});
+}
+function pick(btn){if(S.busy)return;S.busy=true;
+ var q=S.q,ok=+btn.dataset.v===q.ans,mon=document.getElementById("mon"),fb=document.getElementById("fb");
+ rec(q,ok);
+ app.querySelectorAll("[data-v]").forEach(function(b){if(+b.dataset.v===q.ans)b.classList.add("ok")});
+ if(ok){snd("ok");burst();mon.classList.add("hit");S.mhp--;
+  fb.innerHTML='<div class="fb"><b>Kena! 💥</b></div>';
+  if(S.mhp<=0)setTimeout(function(){mon.classList.add("win");setTimeout(defeated,800)},500);else setTimeout(next,900);
+ }else{snd("no");document.getElementById("arena").classList.add("shake");btn.classList.add("no");S.hp--;
+  if(!S.weak.some(function(w){return w[0]===q.x&&w[1]===q.y}))S.weak.push([q.x,q.y]);
+  fb.innerHTML='<div class="fb"><b>Hampir! Begini caranya:</b>'+expl(q)+'</div><div class="center"><button class="go" id="c">'+(S.hp>0?"Lanjut":"Lihat hasil")+'</button></div>';
+  document.getElementById("c").onclick=function(){S.hp>0?next():over()};
+ }}
+function defeated(){var e=monE();
+ if(S.got.indexOf(e)<0){S.got.push(e);sv("pa-koleksi",S.got)}
+ if(S.mi>=2){snd("win");confetti();
+  var es=[0,1,2].map(function(i){return '<div class="slot on">'+POOL[S.op*9+S.lv*3+i]+'</div>'}).join("");
+  app.innerHTML='<div class="center"><h1>Desa selamat! 🎉</h1><p>Semua monster level '+LVN[S.lv]+' ('+OPS[S.op].n+') sudah kalah.</p><div class="shelf" style="justify-content:center">'+es+'</div><p class="soft">'+(S.weak.length?"Latihan lagi: "+S.weak.slice(0,3).map(function(w){return lab(OPS[S.op].k+":"+w[0]+":"+w[1])}).join(", ")+".":"Tanpa salah sama sekali. Hebat!")+'</p><button class="go" id="m">Kembali ke menu</button></div>';
+  document.getElementById("m").onclick=menu;
+ }else{snd("win");
+  app.innerHTML='<div class="center"><h1>'+e+' kalah!</h1><p>Monster masuk koleksimu. Siap lawan berikutnya?</p><button class="go" id="n">Lanjut bertarung</button></div>';
+  document.getElementById("n").onclick=function(){S.mi++;monster()};
+ }}
+function over(){
+ app.innerHTML='<div class="center"><h1>Nyawa habis 😴</h1><p>Tidak apa-apa, monster juga butuh istirahat. Coba lagi, soal yang tadi sulit akan muncul lagi.</p><button class="go" id="r">Coba lagi</button> <button id="m">Menu</button></div>';
+ document.getElementById("r").onclick=function(){S.hp=5;monster()};
+ document.getElementById("m").onclick=menu;
+}
+
+/* ---------- dasbor orang tua ---------- */
+function pinScreen(title,cb,err){
+ app.innerHTML='<div class="top"><button id="b">← Menu</button></div><div class="center"><h1>👨‍👩‍👧 Orang tua</h1><p>'+title+'</p><input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="PIN"><p class="soft">'+(err||"PIN hanya mencegah anak masuk tidak sengaja dan tersimpan di perangkat ini.")+'</p><button class="go" id="ok">Masuk</button></div>';
+ document.getElementById("b").onclick=menu;
+ document.getElementById("ok").onclick=function(){var v=document.getElementById("pin").value;
+  if(/^\d{4}$/.test(v))cb(v);else pinScreen(title,cb,"PIN harus 4 angka.")};
+}
+function parent(){var pin=ld("pa-pin","");
+ if(!pin)pinScreen("Buat PIN 4 angka",function(v){sv("pa-pin",v);dash()});
+ else pinScreen("Masukkan PIN",function ask(v){v===pin?dash():pinScreen("Masukkan PIN",ask,"PIN salah, coba lagi.")});
+}
+function status(n,p){return n<10?"Belum cukup data":p>=85?"Dikuasai":p>=60?"Berkembang":"Perlu latihan"}
+function dash(){var tot=0,cor=0,worst=null,rows="";
+ OPS.forEach(function(o){var d=ST.ops[o.k]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;tot+=d[0];cor+=d[1];
+  if(d[0]>=10&&p<85&&(!worst||p<worst.p))worst={n:o.n,p:p};
+  rows+='<div class="card"><div class="row"><b>'+o.s+' '+o.n+'</b><span class="soft">'+status(d[0],p)+'</span></div><div class="meter"><i style="width:'+p+'%"></i></div><span class="soft">'+d[1]+' benar dari '+d[0]+' soal'+(d[0]?' ('+p+'%)':'')+'</span></div>'});
+ var days=[],mx=1,i;for(i=6;i>=0;i--){var dt=new Date();dt.setDate(dt.getDate()-i);var c=ST.days[dk(dt)]||0;mx=Math.max(mx,c);days.push([["Min","Sen","Sel","Rab","Kam","Jum","Sab"][dt.getDay()],c])}
+ var wk=days.map(function(d){return '<div>'+d[1]+'<i style="height:'+Math.round(d[1]/mx*70)+'px"></i>'+d[0]+'</div>'}).join("");
+ var wr=Object.keys(ST.wrong).sort(function(a,b){return ST.wrong[b]-ST.wrong[a]}).slice(0,5)
+  .map(function(k){return '<div class="row"><span>'+lab(k)+'</span><span class="soft">salah '+ST.wrong[k]+'×</span></div>'}).join("")||'<span class="soft">Belum ada kesalahan tercatat.</span>';
+ var tip=!tot?"Belum ada data. Biarkan ananda bermain dulu.":worst?"Saran: ajak ananda berlatih "+worst.n.toLowerCase()+" ("+worst.p+"% benar). Mulai dari level Pemula agar percaya diri.":"Perkembangan bagus. Coba naik ke level berikutnya atau operasi hitung lain.";
+ app.innerHTML='<div class="top"><button id="b">← Menu</button></div><h1>Laporan belajar</h1>'+
+ '<p class="soft">Total '+tot+' soal dijawab'+(tot?', '+Math.round(cor/tot*100)+'% benar':'')+'.</p><div class="card"><b>'+tip+'</b></div>'+
+ '<h2>Penguasaan per operasi</h2>'+rows+'<h2>Aktivitas 7 hari (jumlah soal)</h2><div class="card"><div class="week">'+wk+'</div></div>'+
+ '<h2>Soal yang paling sering salah</h2><div class="card">'+wr+'</div><p class="center"><button id="rs">Hapus semua data</button></p>';
+ document.getElementById("b").onclick=menu;
+ var rs=document.getElementById("rs");rs.onclick=function(){if(rs.dataset.s){ST={ops:{},days:{},wrong:{}};sv("pa-stat",ST);S.got=[];sv("pa-koleksi",[]);try{localStorage.removeItem("pa-pin")}catch(e){}menu()}
+  else{rs.dataset.s=1;rs.textContent="Yakin? Ketuk lagi untuk menghapus"}};
+}
+menu();
+</script>
+</body>
+</html>
