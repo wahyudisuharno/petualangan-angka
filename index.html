@@ -52,6 +52,9 @@ button:active{transform:translateY(2px);box-shadow:none}
 .bar i{display:block;height:100%;background:var(--coral);transition:width .4s}
 .meter i{display:block;height:100%;background:var(--mint)}
 .q{font-size:2.4rem;font-weight:800;margin:12px 0 4px}
+.q.md{font-size:1.7rem}
+.q.sm{font-size:1.2rem;line-height:1.35;padding:0 6px}
+.q small{display:block;font-size:1rem;font-weight:500;color:var(--soft)}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
 .opts button{font-size:1.8rem;padding:16px 0}
 .opts button.ok{background:var(--mint);color:#06281b}
@@ -83,7 +86,7 @@ var app=document.getElementById("app");
 function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 var MUTE=ld("pa-mute",false),ST=ld("pa-stat",{ops:{},days:{},wrong:{}});
-var S={op:0,lv:0,mi:0,mhp:3,hp:5,q:null,weak:[],busy:false,got:ld("pa-koleksi",[])};
+var S={op:0,lv:0,mi:0,mhp:3,hp:5,q:null,weak:[],seen:[],busy:false,got:ld("pa-koleksi",[])};
 function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1))}
 function shuffle(x){for(var i=x.length-1;i>0;i--){var j=rnd(0,i),t=x[i];x[i]=x[j];x[j]=t}return x}
 function monE(){return POOL[S.op*9+S.lv*3+S.mi]}
@@ -115,10 +118,33 @@ function mk(k,x,y,m){var t,a;
  if(k==="mul"&&!m)c=[a+x,a-x,a+y,a-y,a+1,a-1];
  c=c.filter(function(v,i){return v>0&&v!==a&&c.indexOf(v)===i});
  return{k:k,x:x,y:y,ans:a,text:t,opts:shuffle([a].concat(shuffle(c).slice(0,3)))}}
-function gen(){var k=OPS[S.op].k,r=R[k][S.lv],x,y;
- if(S.weak.length&&Math.random()<.4){var w=S.weak[rnd(0,S.weak.length-1)];x=w[0];y=w[1]}
- else{x=rnd(r[0],r[1]);y=rnd(r[2],r[3])}
- return mk(k,x,y,Math.random()<.5)}
+function gen(){var k=OPS[S.op].k,r=R[k][S.lv],x,y,m,q,t,key,n=0,wk;
+ do{wk=S.weak.length&&Math.random()<.4;
+  if(wk){var w=S.weak[rnd(0,S.weak.length-1)];x=w[0];y=w[1]}else{x=rnd(r[0],r[1]);y=rnd(r[2],r[3])}
+  t=Math.random();q=t<.25?story(k,x,y):t<.375?cmpQ(k,x,y):t<.5?patQ(k,x,y):null;
+  q=q||mk(k,x,y,Math.random()<.5);key=x+":"+y+":"+(q.t||q.text);n++}
+ while(n<40&&S.seen.slice(wk?-4:0).indexOf(key)>-1);
+ S.seen.push(key);if(S.seen.length>24)S.seen.shift();
+ return q}
+function esc(v){return String(v).replace("<","&lt;").replace(">","&gt;")}
+function oo(a,ex){var c=ex.concat([a+1,a-1,a+2,a-2,a+10,a-10]);
+ c=c.filter(function(v,i){return v>0&&v!==a&&c.indexOf(v)===i});return shuffle([a].concat(shuffle(c).slice(0,3)))}
+function ex(k,x,y){return {mul:[x+" × "+y,x*y],add:[x+" + "+y,x+y],sub:[x+" − "+y,x-y],div:[x*y+" ÷ "+x,y]}[k]}
+var NM=["Budi","Sari","Dimas","Putri","Rani","Andi"],IT=[["apel","keranjang"],["kelereng","kotak"],["stiker","amplop"],["permen","toples"],["buku","rak"],["pensil","kotak pensil"]];
+function story(k,x,y){var n=NM[rnd(0,5)],it=IT[rnd(0,5)],a=it[0],w=it[1],t,ans;
+ if(k==="mul"){t=n+" punya "+x+" "+w+". Tiap "+w+" berisi "+y+" "+a+". Berapa "+a+" semuanya?";ans=x*y}
+ else if(k==="add"){t=n+" punya "+x+" "+a+", lalu diberi "+y+" "+a+" lagi. Berapa "+a+" "+n+" sekarang?";ans=x+y}
+ else if(k==="sub"){t=n+" punya "+x+" "+a+". Sebanyak "+y+" "+a+" ia berikan ke temannya. Berapa sisanya?";ans=x-y}
+ else{t=x*y+" "+a+" dibagi rata ke "+x+" "+w+". Berapa "+a+" di tiap "+w+"?";ans=y}
+ return{k:k,x:x,y:y,t:"st",sz:"sm",ans:ans,text:t,opts:oo(ans,k==="mul"?[ans+x,ans-x,ans+y,ans-y]:[])}}
+function cmpQ(k,x,y){var e=ex(k,x,y),v=e[1],c=v+[0,0,0,1,-1,2,-2,3][rnd(0,7)];if(c<1)c=v+1;
+ return{k:k,x:x,y:y,t:"cm",sz:"md",ans:v>c?">":v<c?"<":"=",text:"<small>Pilih tanda yang tepat</small>"+e[0]+" ? "+c,opts:[">","<","="]}}
+function patQ(k,x,y){var T=[],a,i,j;
+ if(k==="mul"){j=y<3?1:y-2;for(i=j;i<j+5;i++)T.push(i===y?"?":x*i);a=x*y}
+ else if(k==="add"){T=[x,"?",x+2*y,x+3*y,x+4*y];a=x+y}
+ else if(k==="sub"){for(i=0;i<5&&x-i*y>0;i++)T.push(x-i*y);if(T.length<3)return null;a=T[1];T[1]="?"}
+ else return null;
+ return{k:k,x:x,y:y,t:"pt",sz:"md",ans:a,text:"<small>Lengkapi pola bilangan</small>"+T.join(", "),opts:oo(a,k==="mul"?[a+x,a-x]:[])}}
 function expl(q){var k=q.k,x=q.x,y=q.y,s;
  if(k==="mul")return x+" × "+y+" berarti "+y+" kelompok berisi "+x+":<br>"+Array(y+1).join(x+" + ").slice(0,-3)+" = "+x*y;
  if(k==="add"){s=x+y;var bt=y-y%10,bo=y%10;
@@ -147,21 +173,21 @@ function menu(){var o=OPS[S.op];
 }
 
 /* ---------- pertarungan ---------- */
-function start(l){S.lv=l;S.mi=0;S.hp=5;S.weak=[];monster()}
+function start(l){S.lv=l;S.mi=0;S.hp=5;S.weak=[];S.seen=S.seen.slice(-6);monster()}
 function monster(){S.mhp=3;next()}
 function next(){S.q=gen();S.busy=false;battle("")}
 function battle(fb){var q=S.q;
  app.innerHTML='<div class="top"><button id="x">← Menu</button><span class="soft">Monster '+(S.mi+1)+'/3</span><span class="hearts" aria-label="Nyawa '+S.hp+'">'+"❤️".repeat(S.hp)+"🖤".repeat(5-S.hp)+'</span></div>'+
  '<div class="arena" id="arena"><div class="mon" id="mon">'+monE()+'</div><div><b>Monster '+OPS[S.op].n+' '+(S.mi+1)+'</b></div><div class="bar"><i style="width:'+(S.mhp/3*100)+'%"></i></div>'+
- '<div class="q">'+q.text+'</div></div>'+
- '<div class="opts">'+q.opts.map(function(v){return '<button data-v="'+v+'">'+v+'</button>'}).join("")+'</div><div id="fb">'+fb+'</div>';
+ '<div class="q'+(q.sz?" "+q.sz:"")+'">'+q.text+'</div></div>'+
+ '<div class="opts">'+q.opts.map(function(v){return '<button data-v="'+esc(v)+'">'+esc(v)+'</button>'}).join("")+'</div><div id="fb">'+fb+'</div>';
  document.getElementById("x").onclick=menu;
  app.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){pick(b)}});
 }
 function pick(btn){if(S.busy)return;S.busy=true;
- var q=S.q,ok=+btn.dataset.v===q.ans,mon=document.getElementById("mon"),fb=document.getElementById("fb");
+ var q=S.q,ok=btn.dataset.v===String(q.ans),mon=document.getElementById("mon"),fb=document.getElementById("fb");
  rec(q,ok);
- app.querySelectorAll("[data-v]").forEach(function(b){if(+b.dataset.v===q.ans)b.classList.add("ok")});
+ app.querySelectorAll("[data-v]").forEach(function(b){if(b.dataset.v===String(q.ans))b.classList.add("ok")});
  if(ok){snd("ok");burst();mon.classList.add("hit");S.mhp--;
   fb.innerHTML='<div class="fb"><b>Kena! 💥</b></div>';
   if(S.mhp<=0)setTimeout(function(){mon.classList.add("win");setTimeout(defeated,800)},500);else setTimeout(next,900);
