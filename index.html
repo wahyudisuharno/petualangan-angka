@@ -37,10 +37,18 @@ button:active{transform:translateY(2px);box-shadow:none}
 .arena.shake{animation:shake .4s}
 .mon{font-size:5.5rem;line-height:1.1;display:inline-block;animation:bob 2.2s ease-in-out infinite}
 .mon.hit{animation:hit .5s}
+.mon.sad{animation:sad 1.3s forwards}
+.mon.laugh{animation:laugh .5s 4}
 .mon.win{animation:win .8s forwards}
+.face{position:absolute;left:calc(50% + 34px);top:8px;font-size:1.8rem;animation:shiv .4s infinite alternate}
+.bub{position:absolute;top:8px;right:10px;background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:2px 10px;font-weight:800;font-size:1.05rem;animation:popin .3s}
 .fx{position:absolute;left:50%;top:42%;font-size:1.8rem;pointer-events:none;animation:fx .7s forwards}
 .cf{position:fixed;top:-30px;font-size:1.6rem;pointer-events:none;animation:fall 2.4s linear forwards;z-index:9}
 @keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes sad{25%{transform:scale(1.15,.8) rotate(-5deg)}100%{transform:scale(.9,.85) translateY(10px) rotate(-8deg);filter:saturate(.5)}}
+@keyframes laugh{25%{transform:rotate(-12deg) translateY(-12px)}75%{transform:rotate(12deg) translateY(-12px)}}
+@keyframes shiv{to{transform:translateX(3px) rotate(8deg)}}
+@keyframes popin{from{transform:scale(0)}}
 @keyframes hit{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px) rotate(-6deg)}60%{transform:translateX(14px) rotate(6deg)}}
 @keyframes win{to{transform:scale(0) rotate(240deg);opacity:0}}
 @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
@@ -98,13 +106,24 @@ function tone(f,d,type){var o=AC.createOscillator(),g=AC.createGain(),s=AC.curre
  g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.18,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+.2);
  o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+.22)}
 function snd(t){if(MUTE)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();
- var q={ok:[[660,0],[880,.09],[1175,.18]],no:[[240,0],[170,.13]],win:[[523,0],[659,.12],[784,.24],[1047,.36]],tap:[[520,0]]}[t];
+ var q={ok:[[660,0],[880,.09],[1175,.18]],no:[[240,0],[170,.13]],lol:[[700,0],[560,.09],[700,.18],[560,.27],[700,.36]],sad:[[400,0],[330,.14],[260,.28],[190,.42]],win:[[523,0],[659,.12],[784,.24],[1047,.36]],tap:[[520,0]]}[t];
  q.forEach(function(n){tone(n[0],n[1],t==="no"?"sawtooth":"triangle")})}catch(e){}}
 
 /* ---------- animasi ---------- */
 function burst(){var a=document.getElementById("arena");if(!a)return;
  ["⚔️","💥","✨","⭐","💥","✨"].forEach(function(e){var s=document.createElement("span");s.className="fx";s.textContent=e;
   s.style.setProperty("--dx",rnd(-100,100)+"px");s.style.setProperty("--dy",rnd(-90,-10)+"px");a.appendChild(s);setTimeout(function(){s.remove()},750)})}
+function say(t,ok){if(MUTE||!window.speechSynthesis)return;try{var s=window.speechSynthesis;s.cancel();
+ var u=new SpeechSynthesisUtterance(t.replace(/[^\p{L}\p{N}\s.!?,]/gu,"").trim());u.lang="id-ID";
+ var v=s.getVoices().filter(function(x){return /^id/i.test(x.lang)})[0];if(v)u.voice=v;
+ u.pitch=ok?1.9:1.6;u.rate=ok?.85:1.1;s.speak(u)}catch(e){}}
+function react(ok){var a=document.getElementById("arena"),m=document.getElementById("mon");if(!a||!m)return;
+ var L=ok?["Aduh! 😭","Ampun... 🥺","Sakit! 😖","Huhu... 😢"]:["Hahaha! 😆","Salah dong~ 🤪","Hihihi! 😜","Yee, meleset! 😝"];
+ var b=document.createElement("div");b.className="bub";b.textContent=L[rnd(0,3)];say(b.textContent,ok);a.appendChild(b);setTimeout(function(){b.remove()},1500);
+ (ok?["💧","😢","💧"]:["😂","🤣","😂"]).forEach(function(e){var s=document.createElement("span");s.className="fx";s.textContent=e;
+  s.style.left=rnd(38,58)+"%";s.style.top=ok?"40%":"30%";s.style.setProperty("--dx",rnd(-40,40)+"px");s.style.setProperty("--dy",(ok?rnd(50,90):rnd(-80,-40))+"px");
+  a.appendChild(s);setTimeout(function(){s.remove()},750)});
+ if(ok)setTimeout(function(){m.classList.remove("hit");m.classList.add("sad")},450);else m.classList.add("laugh")}
 function confetti(){for(var i=0;i<28;i++){var s=document.createElement("span");s.className="cf";s.textContent=["🎉","🎊","⭐","✨"][i%4];
  s.style.left=rnd(0,95)+"vw";s.style.animationDelay=(Math.random()*.8)+"s";document.body.appendChild(s);setTimeout(function(x){x.remove()},3400,s)}}
 
@@ -178,7 +197,7 @@ function monster(){S.mhp=3;next()}
 function next(){S.q=gen();S.busy=false;battle("")}
 function battle(fb){var q=S.q;
  app.innerHTML='<div class="top"><button id="x">← Menu</button><span class="soft">Monster '+(S.mi+1)+'/3</span><span class="hearts" aria-label="Nyawa '+S.hp+'">'+"❤️".repeat(S.hp)+"🖤".repeat(5-S.hp)+'</span></div>'+
- '<div class="arena" id="arena"><div class="mon" id="mon">'+monE()+'</div><div><b>Monster '+OPS[S.op].n+' '+(S.mi+1)+'</b></div><div class="bar"><i style="width:'+(S.mhp/3*100)+'%"></i></div>'+
+ '<div class="arena" id="arena"><div class="mon" id="mon">'+monE()+'</div>'+(S.mhp===1?'<span class="face">😰</span>':'')+'<div><b>Monster '+OPS[S.op].n+' '+(S.mi+1)+'</b></div><div class="bar"><i style="width:'+(S.mhp/3*100)+'%"></i></div>'+
  '<div class="q'+(q.sz?" "+q.sz:"")+'">'+q.text+'</div></div>'+
  '<div class="opts">'+q.opts.map(function(v){return '<button data-v="'+esc(v)+'">'+esc(v)+'</button>'}).join("")+'</div><div id="fb">'+fb+'</div>';
  document.getElementById("x").onclick=menu;
@@ -188,10 +207,10 @@ function pick(btn){if(S.busy)return;S.busy=true;
  var q=S.q,ok=btn.dataset.v===String(q.ans),mon=document.getElementById("mon"),fb=document.getElementById("fb");
  rec(q,ok);
  app.querySelectorAll("[data-v]").forEach(function(b){if(b.dataset.v===String(q.ans))b.classList.add("ok")});
- if(ok){snd("ok");burst();mon.classList.add("hit");S.mhp--;
+ if(ok){snd("ok");burst();mon.classList.add("hit");react(true);S.mhp--;
   fb.innerHTML='<div class="fb"><b>Kena! 💥</b></div>';
-  if(S.mhp<=0)setTimeout(function(){mon.classList.add("win");setTimeout(defeated,800)},500);else setTimeout(next,900);
- }else{snd("no");document.getElementById("arena").classList.add("shake");btn.classList.add("no");S.hp--;
+  if(S.mhp<=0)setTimeout(function(){mon.classList.add("win");setTimeout(defeated,800)},900);else setTimeout(next,1500);
+ }else{snd("no");react(false);document.getElementById("arena").classList.add("shake");btn.classList.add("no");S.hp--;
   if(!S.weak.some(function(w){return w[0]===q.x&&w[1]===q.y}))S.weak.push([q.x,q.y]);
   fb.innerHTML='<div class="fb"><b>Hampir! Begini caranya:</b>'+expl(q)+'</div><div class="center"><button class="go" id="c">'+(S.hp>0?"Lanjut":"Lihat hasil")+'</button></div>';
   document.getElementById("c").onclick=function(){S.hp>0?next():over()};
