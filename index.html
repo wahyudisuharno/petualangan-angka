@@ -118,6 +118,9 @@ button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--edge),inset 0 2
 .opts button.no{background:linear-gradient(180deg,#ff8a9b,#d6233e);color:#fff}
 .mon svg{display:block}
 .ib{width:46px;height:46px;padding:0;display:inline-grid;place-items:center;vertical-align:middle}.ib svg{width:26px;height:26px}
+.pk{width:116px;padding:10px 6px}.pk b{display:block;margin-top:6px;word-break:break-word}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 14px 4px 6px;margin:6px 0}.chip .slot{width:34px;height:34px;border-width:2px}
+.txt{font:inherit;font-size:1rem;letter-spacing:0;width:100%;box-sizing:border-box;text-align:left;padding:8px 10px}textarea.txt{height:90px;resize:vertical}
 .cw{text-align:center;width:62px}.cw[data-fav]{cursor:pointer}.cw small{display:block;font-size:.72rem;line-height:1.1;margin-top:3px}.cw .slot{margin:0 auto}
 .cw.fav .slot{box-shadow:0 0 0 3px #ff9a1a,0 0 14px rgba(255,154,26,.8)}
 .pal{position:absolute;left:2px;top:64px;padding:6px;border-radius:50%;background:radial-gradient(circle,rgba(90,210,255,.65),rgba(90,210,255,0) 70%);animation:bob 2.4s ease-in-out infinite}.pal svg{display:block}.pal.cheer{animation:jump .5s 3}.pal.sadp{animation:sad 1.3s forwards}
@@ -138,8 +141,16 @@ var R={mul:[[2,5,2,5],[6,9,2,9],[2,10,2,10]],add:[[3,15,3,15],[12,89,12,89],[101
 var LVN=["Pemula","Petualang","Pahlawan"];
 var POOL=["👾","🐸","🦑","🐲","🦂","🧟","👹","🐙","🦖","🦇","🐍","🦈","🐊","🦀","🐛","🦎","🐗","🦅","🐺","🦉","🐻","🦍","🦏","🐘","🦁","🐅","🐆","🦒","🦛","🐡","🐌","🦟","🪲","🐢","🦜","🐿"];
 var app=document.getElementById("app");
-function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
-function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var CUR="p1";
+function K(k){return /^pa-(koleksi|stat|fav)$/.test(k)?"pa-"+CUR+"-"+k.slice(3):k}
+function ld(k,d){try{return JSON.parse(localStorage.getItem(K(k)))||d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(K(k),JSON.stringify(v))}catch(e){}}
+function initPF(){var p=ld("pa-profiles",null);
+ if(!p||!p.list||!p.list.length){p={list:[{id:"p1",name:"Pemain 1",av:0}],cur:"p1"};
+  try{["koleksi","stat","fav"].forEach(function(x){var o=localStorage.getItem("pa-"+x);if(o!==null&&localStorage.getItem("pa-p1-"+x)===null)localStorage.setItem("pa-p1-"+x,o)})}catch(e){}
+  sv("pa-profiles",p)}
+ CUR=p.cur;if(!p.list.some(function(x){return x.id===CUR}))CUR=p.cur=p.list[0].id;return p}
+var PF=initPF(),PICKED=false;
 var MUTE=ld("pa-mute",false),ST=ld("pa-stat",{ops:{},days:{},wrong:{}});
 var S={op:0,lv:0,mi:0,mhp:3,hp:5,q:null,weak:[],seen:[],fav:ld("pa-fav",0)-1,busy:false,got:ld("pa-koleksi",[])};
 function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1))}
@@ -255,16 +266,16 @@ function rec(q,ok){var o=ST.ops[q.k]=ST.ops[q.k]||[0,0],d=dk(new Date());o[0]++;
  ST.days[d]=(ST.days[d]||0)+1;if(!ok){var key=q.k+":"+q.x+":"+q.y;ST.wrong[key]=(ST.wrong[key]||0)+1}sv("pa-stat",ST)}
 
 /* ---------- menu ---------- */
-function menu(){var o=OPS[S.op];
+function menu(){if(PF.list.length>1&&!PICKED){picker();return}var o=OPS[S.op];
  var shelf=[0,1,2,3,4,5,6,7,8].map(function(i){var e=POOL[S.op*9+i],on=S.got.indexOf(e)>-1;return '<div class="cw'+(S.op*9+i===S.fav?' fav':'')+'"'+(on?' data-fav="'+(S.op*9+i)+'"':'')+'><div class="slot '+(on?'on':'off')+'">'+monSVG(S.op*9+i,"idle",38,i%3===2)+'</div><small>'+(on?NMS[S.op*9+i]:"???")+'</small></div>'}).join("");
  var n=S.got.filter(function(e){var i=POOL.indexOf(e);return i>=S.op*9&&i<S.op*9+9}).length;
  app.innerHTML='<div class="top"><h1>Petualangan Angka</h1><span><button class="ib" id="mu" aria-label="Suara" title="Suara">'+(MUTE?ICO.off:ICO.on)+'</button> <button class="ib" id="pr" aria-label="Orang tua" title="Orang tua">'+ICO.par+'</button></span></div>'+
- '<p class="soft">Monster takut pada hitungan. Jawab dengan benar untuk menyerang!</p>'+
+ (PF.list.length>1?'<button class="chip" id="chip"><span class="slot on">'+monSVG(avOf(cp()),"idle",26,avOf(cp())%3===2)+'</span><b>'+xe(cp().name)+'</b> <span class="soft">ganti</span></button>':'')+'<p class="soft">Monster takut pada hitungan. Jawab dengan benar untuk menyerang!</p>'+
  '<div class="tabs">'+OPS.map(function(p,i){return '<button class="tab'+(i===S.op?' on':'')+'" data-op="'+i+'"><b>'+p.s+'</b>'+p.n+'</button>'}).join("")+'</div>'+
  o.lv.map(function(d,i){return '<button class="lv" data-lv="'+i+'"><span>'+LVN[i]+'<small>'+d+'</small></span><span>⚔️</span></button>'}).join("")+
  '<p><b>Koleksi monster '+o.n+'</b> <span class="soft">('+n+'/9)</span></p><div class="shelf">'+shelf+'</div><p class="soft">'+(S.fav>=0?"Teman setia: <b>"+NMS[S.fav]+"</b>. Ketuk monster koleksi untuk ganti.":"Ketuk monster koleksi untuk memilih teman setia yang menyemangatimu saat bertarung.")+'</p>';
  document.getElementById("mu").onclick=function(){MUTE=!MUTE;sv("pa-mute",MUTE);snd("tap");menu()};
- document.getElementById("pr").onclick=parent;
+ document.getElementById("pr").onclick=parent;var ch=document.getElementById("chip");if(ch)ch.onclick=picker;
  app.querySelectorAll("[data-fav]").forEach(function(b){b.onclick=function(){S.fav=+b.dataset.fav;sv("pa-fav",S.fav+1);snd("tap");menu()}});
  app.querySelectorAll("[data-op]").forEach(function(b){b.onclick=function(){S.op=+b.dataset.op;snd("tap");menu()}});
  app.querySelectorAll("[data-lv]").forEach(function(b){b.onclick=function(){snd("tap");start(+b.dataset.lv)}});
@@ -322,7 +333,7 @@ function parent(){var pin=ld("pa-pin","");
  else pinScreen("Masukkan PIN",function ask(v){v===pin?dash():pinScreen("Masukkan PIN",ask,"PIN salah, coba lagi.")});
 }
 function status(n,p){return n<10?"Belum cukup data":p>=85?"Dikuasai":p>=60?"Berkembang":"Perlu latihan"}
-function dash(){var tot=0,cor=0,worst=null,rows="";
+function dash(pid){pid=pid||CUR;var ST=pid===CUR?window.ST:statOf(pid),tot=0,cor=0,worst=null,rows="";
  OPS.forEach(function(o){var d=ST.ops[o.k]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;tot+=d[0];cor+=d[1];
   if(d[0]>=10&&p<85&&(!worst||p<worst.p))worst={n:o.n,p:p};
   rows+='<div class="card"><div class="row"><b>'+o.s+' '+o.n+'</b><span class="soft">'+status(d[0],p)+'</span></div><div class="meter"><i style="width:'+p+'%"></i></div><span class="soft">'+d[1]+' benar dari '+d[0]+' soal'+(d[0]?' ('+p+'%)':'')+'</span></div>'});
@@ -331,13 +342,55 @@ function dash(){var tot=0,cor=0,worst=null,rows="";
  var wr=Object.keys(ST.wrong).sort(function(a,b){return ST.wrong[b]-ST.wrong[a]}).slice(0,5)
   .map(function(k){return '<div class="row"><span>'+lab(k)+'</span><span class="soft">salah '+ST.wrong[k]+'×</span></div>'}).join("")||'<span class="soft">Belum ada kesalahan tercatat.</span>';
  var tip=!tot?"Belum ada data. Biarkan ananda bermain dulu.":worst?"Saran: ajak ananda berlatih "+worst.n.toLowerCase()+" ("+worst.p+"% benar). Mulai dari level Pemula agar percaya diri.":"Perkembangan bagus. Coba naik ke level berikutnya atau operasi hitung lain.";
- app.innerHTML='<div class="top"><button id="b">← Menu</button></div><h1>Laporan belajar</h1>'+
+ app.innerHTML='<div class="top"><button id="b">← Menu</button></div><h1>Laporan belajar</h1>'+ptabs(pid)+
  '<p class="soft">Total '+tot+' soal dijawab'+(tot?', '+Math.round(cor/tot*100)+'% benar':'')+'.</p><div class="card"><b>'+tip+'</b></div>'+
  '<h2>Penguasaan per operasi</h2>'+rows+'<h2>Aktivitas 7 hari (jumlah soal)</h2><div class="card"><div class="week">'+wk+'</div></div>'+
- '<h2>Soal yang paling sering salah</h2><div class="card">'+wr+'</div><p class="center"><button id="rs">Hapus semua data</button></p>';
+ '<h2>Soal yang paling sering salah</h2><div class="card">'+wr+'</div><p class="center"><button class="go" id="mg">Kelola anak &amp; cadangan</button></p><p class="center"><button id="rs">Hapus data anak ini</button></p>';
  document.getElementById("b").onclick=menu;
- var rs=document.getElementById("rs");rs.onclick=function(){if(rs.dataset.s){ST={ops:{},days:{},wrong:{}};sv("pa-stat",ST);S.got=[];sv("pa-koleksi",[]);S.fav=-1;sv("pa-fav",0);try{localStorage.removeItem("pa-pin")}catch(e){}menu()}
-  else{rs.dataset.s=1;rs.textContent="Yakin? Ketuk lagi untuk menghapus"}};
+ bindP();
+ var rs=document.getElementById("rs");rs.onclick=function(){if(rs.dataset.s){wipe(pid);dash(pid)}else{rs.dataset.s=1;rs.textContent="Yakin? Ketuk lagi untuk menghapus"}};
+}
+/* ---------- profil anak & cadangan ---------- */
+function xe(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function lsj(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+function statOf(id){return lsj("pa-"+id+"-stat")||{ops:{},days:{},wrong:{}}}
+function favOf(id){return (lsj("pa-"+id+"-fav")||0)-1}
+function avOf(p){var f=favOf(p.id);return f>=0?f:p.av}
+function cp(){return PF.list.filter(function(p){return p.id===CUR})[0]||PF.list[0]}
+function loadCur(){ST=ld("pa-stat",{ops:{},days:{},wrong:{}});S.got=ld("pa-koleksi",[]);S.fav=ld("pa-fav",0)-1}
+function switchTo(id){CUR=PF.cur=id;sv("pa-profiles",PF);loadCur();PICKED=true;menu()}
+function wipe(id){["koleksi","stat","fav"].forEach(function(x){try{localStorage.removeItem("pa-"+id+"-"+x)}catch(e){}});if(id===CUR)loadCur()}
+function ptabs(pid){return PF.list.length<2?"":'<div class="tabs">'+PF.list.map(function(p){return '<button class="tab'+(p.id===pid?' on':'')+'" data-pv="'+p.id+'">'+xe(p.name)+'</button>'}).join("")+'</div>'}
+function bindP(){app.querySelectorAll("[data-pv]").forEach(function(b){b.onclick=function(){dash(b.dataset.pv)}});document.getElementById("mg").onclick=function(){manage()}}
+function picker(){app.innerHTML='<div class="center"><h1>Siapa yang main?</h1><div class="shelf" style="justify-content:center;gap:14px">'+PF.list.map(function(p){var a=avOf(p);return '<button class="pk" data-id="'+p.id+'"><div class="slot on" style="width:78px;height:78px;margin:0 auto">'+monSVG(a,"idle",64,a%3===2)+'</div><b>'+xe(p.name)+'</b></button>'}).join("")+'</div></div>';
+ app.querySelectorAll("[data-id]").forEach(function(b){b.onclick=function(){snd("tap");switchTo(b.dataset.id)}})}
+function bk(){var o={v:1,app:"petualangan-angka",profiles:PF,data:{},mute:MUTE};
+ PF.list.forEach(function(p){o.data[p.id]={koleksi:lsj("pa-"+p.id+"-koleksi"),stat:lsj("pa-"+p.id+"-stat"),fav:lsj("pa-"+p.id+"-fav")}});
+ sv("pa-lastbackup",dk(new Date()));return "PA1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
+function rest(t){try{t=t.trim();var o=JSON.parse(t.indexOf("PA1:")===0?decodeURIComponent(escape(atob(t.slice(4)))):t);
+ if(!o||o.app!=="petualangan-angka"||!o.profiles||!o.profiles.list||!o.data)return false;
+ o.profiles.list.slice(0,8).forEach(function(p){var id=String(p.id).replace(/[^\w]/g,""),d=o.data[p.id]||{},nm=String(p.name).slice(0,14),f=PF.list.filter(function(q){return q.id===id})[0];
+  ["koleksi","stat","fav"].forEach(function(x){if(d[x]!=null)localStorage.setItem("pa-"+id+"-"+x,JSON.stringify(d[x]))});
+  if(f)f.name=nm;else PF.list.push({id:id,name:nm,av:+p.av||0})});
+ sv("pa-profiles",PF);loadCur();return true}catch(e){return false}}
+function note(t){var e=document.getElementById("mm");if(e)e.innerHTML='<div class="fb"><b>'+t+'</b></div>'}
+function manage(msg){
+ var L=PF.list.map(function(p){return '<div class="card"><input class="txt" data-nm="'+p.id+'" value="'+xe(p.name)+'" maxlength="14" aria-label="Nama anak"><div class="row" style="margin-top:8px"><button data-sv="'+p.id+'">Simpan nama</button>'+(PF.list.length>1?'<button data-dl="'+p.id+'">Hapus anak</button>':'')+'</div></div>'}).join("");
+ app.innerHTML='<div class="top"><button id="b">← Laporan</button></div><h1>Kelola anak</h1><div id="mm">'+(msg?'<div class="fb"><b>'+msg+'</b></div>':'')+'</div>'+L+
+ (PF.list.length<6?'<div class="card"><input class="txt" id="nn" maxlength="14" placeholder="Nama anak baru" aria-label="Nama anak baru"><p class="center"><button class="go" id="add">Tambah anak</button></p></div>':'')+
+ '<h2>Cadangan progres</h2><div class="card"><p>Cadangan menyimpan semua anak, koleksi monster, dan laporan belajar. Simpan kodenya di tempat aman, misalnya dikirim ke chat sendiri. Terakhir dicadangkan: <b>'+(ld("pa-lastbackup","")||"belum pernah")+'</b></p><div class="row"><button class="go" id="cp">Salin kode</button><button id="dlf">Unduh file</button></div></div>'+
+ '<div class="card"><b>Pulihkan dari cadangan</b><p class="soft">Data anak dengan ID yang sama di perangkat ini akan ditimpa.</p><textarea class="txt" id="rt" placeholder="Tempel kode cadangan di sini" aria-label="Kode cadangan"></textarea><p class="center"><input type="file" id="rf" accept=".txt,.json" style="display:none"><button id="pf2">Pilih file</button> <button class="go" id="rs2">Pulihkan</button></p></div>';
+ var $=function(i){return document.getElementById(i)};
+ $("b").onclick=function(){dash(CUR)};
+ app.querySelectorAll("[data-sv]").forEach(function(b){b.onclick=function(){var id=b.dataset.sv,v=app.querySelector('[data-nm="'+id+'"]').value.trim();if(!v)return note("Nama tidak boleh kosong.");PF.list.forEach(function(p){if(p.id===id)p.name=v});sv("pa-profiles",PF);manage("Nama disimpan.")}});
+ app.querySelectorAll("[data-dl]").forEach(function(b){b.onclick=function(){if(!b.dataset.s){b.dataset.s=1;b.textContent="Yakin? Ketuk lagi";return}
+  var id=b.dataset.dl;wipe(id);PF.list=PF.list.filter(function(p){return p.id!==id});if(CUR===id){CUR=PF.cur=PF.list[0].id;loadCur()}sv("pa-profiles",PF);manage("Anak dihapus.")}});
+ if($("add"))$("add").onclick=function(){var v=$("nn").value.trim();if(!v)return note("Isi nama anak dulu.");PF.list.push({id:"p"+Date.now().toString(36),name:v.slice(0,14),av:(PF.list.length*5+3)%36});sv("pa-profiles",PF);manage("Anak ditambahkan.")};
+ $("cp").onclick=function(){var c=bk(),t=$("rt");t.value=c;try{navigator.clipboard.writeText(c).then(function(){note("Kode cadangan disalin. Simpan di tempat aman.")},function(){t.select();note("Salin kode di kotak bawah secara manual.")})}catch(e){t.select();note("Salin kode di kotak bawah secara manual.")}};
+ $("dlf").onclick=function(){var c=bk();try{var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([c],{type:"text/plain"}));a.download="cadangan-petualangan-angka-"+dk(new Date())+".txt";document.body.appendChild(a);a.click();a.remove();note("File cadangan diunduh.")}catch(e){$("rt").value=c;note("Unduh tidak didukung di sini. Salin kode di kotak bawah.")}};
+ $("pf2").onclick=function(){$("rf").click()};
+ $("rf").onchange=function(){var f=this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){$("rt").value=r.result;note("File dibaca. Ketuk Pulihkan untuk melanjutkan.")};r.readAsText(f)};
+ $("rs2").onclick=function(){var t=$("rt").value;if(!t.trim())return note("Tempel kode cadangan dulu.");rest(t)?manage("Pemulihan berhasil."):note("Kode tidak valid. Pastikan kode tersalin utuh.")};
 }
 menu();
 </script>
