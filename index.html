@@ -6,12 +6,12 @@
 <meta name="theme-color" content="#4b3fd1">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Angka">
+<meta name="apple-mobile-web-app-title" content="Monster">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<title>Petualangan Angka</title>
+<title>Kampung Monster</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap">
 <style>
 :root{--bg:#eef0ff;--panel:#fff;--ink:#1b1740;--soft:#6a66a0;--line:#d6d9f7;--sun:#ffc400;--mint:#14b87a;--coral:#ef4560;--btn:#4b3fd1;--btnink:#fff;
@@ -126,6 +126,19 @@ button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--edge),inset 0 2
 .pal{position:absolute;left:2px;top:64px;padding:6px;border-radius:50%;background:radial-gradient(circle,rgba(90,210,255,.65),rgba(90,210,255,0) 70%);animation:bob 2.4s ease-in-out infinite}.pal svg{display:block}.pal.cheer{animation:jump .5s 3}.pal.sadp{animation:sad 1.3s forwards}
 @keyframes jump{0%,100%{transform:translateY(0)}30%{transform:translateY(-24px) rotate(-10deg)}60%{transform:translateY(-8px) rotate(10deg)}}
 .arena::before{content:"";font-size:0;left:16px;top:22px;width:46px;height:16px;border-radius:16px;background:#fff;box-shadow:14px -8px 0 2px #fff,28px 0 0 -2px #fff;opacity:.85}
+
+:root[data-game="dk"]{--sky1:#43cfc0;--sky2:#e9fffb;--a1:#6fdccf;--a2:#e9fffb;--grass:#ffb347;--grass2:#ef8a1f}
+@media (prefers-color-scheme:dark){:root[data-game="dk"]:not([data-theme="light"]){--sky1:#062a30;--sky2:#0f5560;--a1:#0f5560;--a2:#1f8a92;--grass:#b8742f;--grass2:#82501f}}
+:root[data-theme="dark"][data-game="dk"]{--sky1:#062a30;--sky2:#0f5560;--a1:#0f5560;--a2:#1f8a92;--grass:#b8742f;--grass2:#82501f}
+.opts button.long{font-size:1.05rem;line-height:1.25;padding:14px 8px}
+.q.mid{font-size:1.35rem;line-height:1.3;padding:8px 10px}
+.gc{padding:12px 16px;margin:12px 0}.gc b{display:block;font-size:1.3rem}.gc small{color:inherit;opacity:.9}
+.ga{background:linear-gradient(180deg,#8f9bff,#4b3fd1);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.gd{background:linear-gradient(180deg,#6fe9da,#10a395);color:#05302b}
+.gw{background:linear-gradient(180deg,#ffd36e,#ff9a1a);color:#4a2600}
+:root[data-game="wr"]{--sky1:#ffa94d;--sky2:#fff1dc;--a1:#ffc98a;--a2:#fff6e8;--grass:#7ed957;--grass2:#4fb83a}
+@media (prefers-color-scheme:dark){:root[data-game="wr"]:not([data-theme="light"]){--sky1:#3a1a08;--sky2:#7a3b12;--a1:#6a3410;--a2:#b8651f;--grass:#5a8f2e;--grass2:#3d6a1f}}
+:root[data-theme="dark"][data-game="wr"]{--sky1:#3a1a08;--sky2:#7a3b12;--a1:#6a3410;--a2:#b8651f;--grass:#5a8f2e;--grass2:#3d6a1f}
 </style>
 </head>
 <body>
@@ -142,7 +155,7 @@ var LVN=["Pemula","Petualang","Pahlawan"];
 var POOL=["👾","🐸","🦑","🐲","🦂","🧟","👹","🐙","🦖","🦇","🐍","🦈","🐊","🦀","🐛","🦎","🐗","🦅","🐺","🦉","🐻","🦍","🦏","🐘","🦁","🐅","🐆","🦒","🦛","🐡","🐌","🦟","🪲","🐢","🦜","🐿"];
 var app=document.getElementById("app");
 var CUR="p1";
-function K(k){return /^pa-(koleksi|stat|fav)$/.test(k)?"pa-"+CUR+"-"+k.slice(3):k}
+function K(k){return /^pa-(koleksi|stat|fav|dkkoleksi|dkstat|wrkoleksi|wrstat)$/.test(k)?"pa-"+CUR+"-"+k.slice(3):k}
 function ld(k,d){try{return JSON.parse(localStorage.getItem(K(k)))||d}catch(e){return d}}
 function sv(k,v){try{localStorage.setItem(K(k),JSON.stringify(v))}catch(e){}}
 function initPF(){var p=ld("pa-profiles",null);
@@ -266,16 +279,16 @@ function rec(q,ok){var o=ST.ops[q.k]=ST.ops[q.k]||[0,0],d=dk(new Date());o[0]++;
  ST.days[d]=(ST.days[d]||0)+1;if(!ok){var key=q.k+":"+q.x+":"+q.y;ST.wrong[key]=(ST.wrong[key]||0)+1}sv("pa-stat",ST)}
 
 /* ---------- menu ---------- */
-function menu(){if(PF.list.length>1&&!PICKED){picker();return}var o=OPS[S.op];
+function menu(){if(PF.list.length>1&&!PICKED){picker();return}document.documentElement.dataset.game="";var o=OPS[S.op];
  var shelf=[0,1,2,3,4,5,6,7,8].map(function(i){var e=POOL[S.op*9+i],on=S.got.indexOf(e)>-1;return '<div class="cw'+(S.op*9+i===S.fav?' fav':'')+'"'+(on?' data-fav="'+(S.op*9+i)+'"':'')+'><div class="slot '+(on?'on':'off')+'">'+monSVG(S.op*9+i,"idle",38,i%3===2)+'</div><small>'+(on?NMS[S.op*9+i]:"???")+'</small></div>'}).join("");
  var n=S.got.filter(function(e){var i=POOL.indexOf(e);return i>=S.op*9&&i<S.op*9+9}).length;
- app.innerHTML='<div class="top"><h1>Petualangan Angka</h1><span><button class="ib" id="mu" aria-label="Suara" title="Suara">'+(MUTE?ICO.off:ICO.on)+'</button> <button class="ib" id="pr" aria-label="Orang tua" title="Orang tua">'+ICO.par+'</button></span></div>'+
+ app.innerHTML='<div class="top"><button id="hb">← Kampung</button><button class="ib" id="mu" aria-label="Suara" title="Suara">'+(MUTE?ICO.off:ICO.on)+'</button></div><h1>Petualangan Angka</h1>'+
  (PF.list.length>1?'<button class="chip" id="chip"><span class="slot on">'+monSVG(avOf(cp()),"idle",26,avOf(cp())%3===2)+'</span><b>'+xe(cp().name)+'</b> <span class="soft">ganti</span></button>':'')+'<p class="soft">Monster takut pada hitungan. Jawab dengan benar untuk menyerang!</p>'+
  '<div class="tabs">'+OPS.map(function(p,i){return '<button class="tab'+(i===S.op?' on':'')+'" data-op="'+i+'"><b>'+p.s+'</b>'+p.n+'</button>'}).join("")+'</div>'+
  o.lv.map(function(d,i){return '<button class="lv" data-lv="'+i+'"><span>'+LVN[i]+'<small>'+d+'</small></span><span>⚔️</span></button>'}).join("")+
  '<p><b>Koleksi monster '+o.n+'</b> <span class="soft">('+n+'/9)</span></p><div class="shelf">'+shelf+'</div><p class="soft">'+(S.fav>=0?"Teman setia: <b>"+NMS[S.fav]+"</b>. Ketuk monster koleksi untuk ganti.":"Ketuk monster koleksi untuk memilih teman setia yang menyemangatimu saat bertarung.")+'</p>';
  document.getElementById("mu").onclick=function(){MUTE=!MUTE;sv("pa-mute",MUTE);snd("tap");menu()};
- document.getElementById("pr").onclick=parent;var ch=document.getElementById("chip");if(ch)ch.onclick=picker;
+ document.getElementById("hb").onclick=hub;var ch=document.getElementById("chip");if(ch)ch.onclick=picker;
  app.querySelectorAll("[data-fav]").forEach(function(b){b.onclick=function(){S.fav=+b.dataset.fav;sv("pa-fav",S.fav+1);snd("tap");menu()}});
  app.querySelectorAll("[data-op]").forEach(function(b){b.onclick=function(){S.op=+b.dataset.op;snd("tap");menu()}});
  app.querySelectorAll("[data-lv]").forEach(function(b){b.onclick=function(){snd("tap");start(+b.dataset.lv)}});
@@ -324,7 +337,7 @@ function over(){
 /* ---------- dasbor orang tua ---------- */
 function pinScreen(title,cb,err){
  app.innerHTML='<div class="top"><button id="b">← Menu</button></div><div class="center"><h1>Orang tua</h1><p>'+title+'</p><input id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="PIN"><p class="soft">'+(err||"PIN hanya mencegah anak masuk tidak sengaja dan tersimpan di perangkat ini.")+'</p><button class="go" id="ok">Masuk</button></div>';
- document.getElementById("b").onclick=menu;
+ document.getElementById("b").onclick=hub;
  document.getElementById("ok").onclick=function(){var v=document.getElementById("pin").value;
   if(/^\d{4}$/.test(v))cb(v);else pinScreen(title,cb,"PIN harus 4 angka.")};
 }
@@ -333,20 +346,20 @@ function parent(){var pin=ld("pa-pin","");
  else pinScreen("Masukkan PIN",function ask(v){v===pin?dash():pinScreen("Masukkan PIN",ask,"PIN salah, coba lagi.")});
 }
 function status(n,p){return n<10?"Belum cukup data":p>=85?"Dikuasai":p>=60?"Berkembang":"Perlu latihan"}
-function dash(pid){pid=pid||CUR;var ST=pid===CUR?window.ST:statOf(pid),tot=0,cor=0,worst=null,rows="";
+function dash(pid){pid=pid||CUR;var DKS=pid===CUR?DK.stat():(lsj("pa-"+pid+"-dkstat")||{c:{},days:{}}),WRS=pid===CUR?WR.stat():(lsj("pa-"+pid+"-wrstat")||{c:{},days:{}}),ST=pid===CUR?window.ST:statOf(pid),tot=0,cor=0,worst=null,rows="";
  OPS.forEach(function(o){var d=ST.ops[o.k]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;tot+=d[0];cor+=d[1];
   if(d[0]>=10&&p<85&&(!worst||p<worst.p))worst={n:o.n,p:p};
   rows+='<div class="card"><div class="row"><b>'+o.s+' '+o.n+'</b><span class="soft">'+status(d[0],p)+'</span></div><div class="meter"><i style="width:'+p+'%"></i></div><span class="soft">'+d[1]+' benar dari '+d[0]+' soal'+(d[0]?' ('+p+'%)':'')+'</span></div>'});
- var days=[],mx=1,i;for(i=6;i>=0;i--){var dt=new Date();dt.setDate(dt.getDate()-i);var c=ST.days[dk(dt)]||0;mx=Math.max(mx,c);days.push([["Min","Sen","Sel","Rab","Kam","Jum","Sab"][dt.getDay()],c])}
+ var days=[],mx=1,i;for(i=6;i>=0;i--){var dt=new Date();dt.setDate(dt.getDate()-i);var c=(ST.days[dk(dt)]||0)+((DKS.days||{})[dk(dt)]||0)+((WRS.days||{})[dk(dt)]||0);mx=Math.max(mx,c);days.push([["Min","Sen","Sel","Rab","Kam","Jum","Sab"][dt.getDay()],c])}
  var wk=days.map(function(d){return '<div>'+d[1]+'<i style="height:'+Math.round(d[1]/mx*70)+'px"></i>'+d[0]+'</div>'}).join("");
  var wr=Object.keys(ST.wrong).sort(function(a,b){return ST.wrong[b]-ST.wrong[a]}).slice(0,5)
   .map(function(k){return '<div class="row"><span>'+lab(k)+'</span><span class="soft">salah '+ST.wrong[k]+'×</span></div>'}).join("")||'<span class="soft">Belum ada kesalahan tercatat.</span>';
- var tip=!tot?"Belum ada data. Biarkan ananda bermain dulu.":worst?"Saran: ajak ananda berlatih "+worst.n.toLowerCase()+" ("+worst.p+"% benar). Mulai dari level Pemula agar percaya diri.":"Perkembangan bagus. Coba naik ke level berikutnya atau operasi hitung lain.";
+ var tip=!(tot+dn(DKS)+dn(WRS))?"Belum ada data. Biarkan ananda bermain dulu.":worst?"Saran: ajak ananda berlatih "+worst.n.toLowerCase()+" ("+worst.p+"% benar). Mulai dari level Pemula agar percaya diri.":"Perkembangan bagus. Coba naik ke level berikutnya atau operasi hitung lain.";
  app.innerHTML='<div class="top"><button id="b">← Menu</button></div><h1>Laporan belajar</h1>'+ptabs(pid)+
- '<p class="soft">Total '+tot+' soal dijawab'+(tot?', '+Math.round(cor/tot*100)+'% benar':'')+'.</p><div class="card"><b>'+tip+'</b></div>'+
- '<h2>Penguasaan per operasi</h2>'+rows+'<h2>Aktivitas 7 hari (jumlah soal)</h2><div class="card"><div class="week">'+wk+'</div></div>'+
+ '<p class="soft">Total '+(tot+dn(DKS)+dn(WRS))+' soal dijawab ('+tot+' berhitung, '+dn(DKS)+' bahasa, '+dn(WRS)+' uang & waktu).</p><div class="card"><b>'+tip+'</b>'+dkTip(DKS)+wrTip(WRS)+'</div>'+
+ '<h2>Berhitung (Petualangan Angka)</h2>'+rows+'<h2>Bahasa (Detektif Kata)</h2>'+dkRows(DKS)+'<h2>Uang & waktu (Warung Si Monster)</h2>'+wrRows(WRS)+'<h2>Aktivitas 7 hari (jumlah soal)</h2><div class="card"><div class="week">'+wk+'</div></div>'+
  '<h2>Soal yang paling sering salah</h2><div class="card">'+wr+'</div><p class="center"><button class="go" id="mg">Kelola anak &amp; cadangan</button></p><p class="center"><button id="rs">Hapus data anak ini</button></p>';
- document.getElementById("b").onclick=menu;
+ document.getElementById("b").onclick=hub;
  bindP();
  var rs=document.getElementById("rs");rs.onclick=function(){if(rs.dataset.s){wipe(pid);dash(pid)}else{rs.dataset.s=1;rs.textContent="Yakin? Ketuk lagi untuk menghapus"}};
 }
@@ -357,20 +370,20 @@ function statOf(id){return lsj("pa-"+id+"-stat")||{ops:{},days:{},wrong:{}}}
 function favOf(id){return (lsj("pa-"+id+"-fav")||0)-1}
 function avOf(p){var f=favOf(p.id);return f>=0?f:p.av}
 function cp(){return PF.list.filter(function(p){return p.id===CUR})[0]||PF.list[0]}
-function loadCur(){ST=ld("pa-stat",{ops:{},days:{},wrong:{}});S.got=ld("pa-koleksi",[]);S.fav=ld("pa-fav",0)-1}
-function switchTo(id){CUR=PF.cur=id;sv("pa-profiles",PF);loadCur();PICKED=true;menu()}
-function wipe(id){["koleksi","stat","fav"].forEach(function(x){try{localStorage.removeItem("pa-"+id+"-"+x)}catch(e){}});if(id===CUR)loadCur()}
+function loadCur(){ST=ld("pa-stat",{ops:{},days:{},wrong:{}});S.got=ld("pa-koleksi",[]);S.fav=ld("pa-fav",0)-1;DK.load();WR.load()}
+function switchTo(id){CUR=PF.cur=id;sv("pa-profiles",PF);loadCur();PICKED=true;hub()}
+function wipe(id){["koleksi","stat","fav","dkkoleksi","dkstat","wrkoleksi","wrstat"].forEach(function(x){try{localStorage.removeItem("pa-"+id+"-"+x)}catch(e){}});if(id===CUR)loadCur()}
 function ptabs(pid){return PF.list.length<2?"":'<div class="tabs">'+PF.list.map(function(p){return '<button class="tab'+(p.id===pid?' on':'')+'" data-pv="'+p.id+'">'+xe(p.name)+'</button>'}).join("")+'</div>'}
 function bindP(){app.querySelectorAll("[data-pv]").forEach(function(b){b.onclick=function(){dash(b.dataset.pv)}});document.getElementById("mg").onclick=function(){manage()}}
 function picker(){app.innerHTML='<div class="center"><h1>Siapa yang main?</h1><div class="shelf" style="justify-content:center;gap:14px">'+PF.list.map(function(p){var a=avOf(p);return '<button class="pk" data-id="'+p.id+'"><div class="slot on" style="width:78px;height:78px;margin:0 auto">'+monSVG(a,"idle",64,a%3===2)+'</div><b>'+xe(p.name)+'</b></button>'}).join("")+'</div></div>';
  app.querySelectorAll("[data-id]").forEach(function(b){b.onclick=function(){snd("tap");switchTo(b.dataset.id)}})}
 function bk(){var o={v:1,app:"petualangan-angka",profiles:PF,data:{},mute:MUTE};
- PF.list.forEach(function(p){o.data[p.id]={koleksi:lsj("pa-"+p.id+"-koleksi"),stat:lsj("pa-"+p.id+"-stat"),fav:lsj("pa-"+p.id+"-fav")}});
+ PF.list.forEach(function(p){o.data[p.id]={koleksi:lsj("pa-"+p.id+"-koleksi"),stat:lsj("pa-"+p.id+"-stat"),fav:lsj("pa-"+p.id+"-fav"),dkkoleksi:lsj("pa-"+p.id+"-dkkoleksi"),dkstat:lsj("pa-"+p.id+"-dkstat"),wrkoleksi:lsj("pa-"+p.id+"-wrkoleksi"),wrstat:lsj("pa-"+p.id+"-wrstat")}});
  sv("pa-lastbackup",dk(new Date()));return "PA1:"+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
 function rest(t){try{t=t.trim();var o=JSON.parse(t.indexOf("PA1:")===0?decodeURIComponent(escape(atob(t.slice(4)))):t);
  if(!o||o.app!=="petualangan-angka"||!o.profiles||!o.profiles.list||!o.data)return false;
  o.profiles.list.slice(0,8).forEach(function(p){var id=String(p.id).replace(/[^\w]/g,""),d=o.data[p.id]||{},nm=String(p.name).slice(0,14),f=PF.list.filter(function(q){return q.id===id})[0];
-  ["koleksi","stat","fav"].forEach(function(x){if(d[x]!=null)localStorage.setItem("pa-"+id+"-"+x,JSON.stringify(d[x]))});
+  ["koleksi","stat","fav","dkkoleksi","dkstat","wrkoleksi","wrstat"].forEach(function(x){if(d[x]!=null)localStorage.setItem("pa-"+id+"-"+x,JSON.stringify(d[x]))});
   if(f)f.name=nm;else PF.list.push({id:id,name:nm,av:+p.av||0})});
  sv("pa-profiles",PF);loadCur();return true}catch(e){return false}}
 function note(t){var e=document.getElementById("mm");if(e)e.innerHTML='<div class="fb"><b>'+t+'</b></div>'}
@@ -392,7 +405,366 @@ function manage(msg){
  $("rf").onchange=function(){var f=this.files[0];if(!f)return;var r=new FileReader();r.onload=function(){$("rt").value=r.result;note("File dibaca. Ketuk Pulihkan untuk melanjutkan.")};r.readAsText(f)};
  $("rs2").onclick=function(){var t=$("rt").value;if(!t.trim())return note("Tempel kode cadangan dulu.");rest(t)?manage("Pemulihan berhasil."):note("Kode tidak valid. Pastikan kode tersalin utuh.")};
 }
-menu();
+var DKD=[[0,0,280],[1,2,330],[2,1,45],[3,0,8],[0,2,300],[1,1,35],[2,0,255],[3,2,350],[0,1,20]];
+function dkSVG(j,m,sz,bs){var d=DKD[j%9],b=d[0],a=d[1],h=d[2],c=Math.floor(j/3)%3,col="hsl("+h+",75%,62%)",dd="hsl("+h+",60%,26%)",ln=" stroke='"+dd+"' stroke-width='4' stroke-linejoin='round'",s="",
+ AN=[[100,46,38],[100,68,30],[100,56,40],[100,62,40]][b],cx=AN[0],t=AN[1],w=AN[2],fy=(b===0||b===3)?108:112,
+ body=["<path d='M44 170V100Q44 44 100 44Q156 44 156 100V170L134 154L116 172L100 154L84 172L66 154Z' ","<path d='M100 38Q152 100 152 132Q152 176 100 176Q48 176 48 132Q48 100 100 38Z' ","<rect x='52' y='56' width='96' height='114' rx='10' ","<path d='M44 60H156Q164 60 164 70V146Q164 156 156 156H92L66 180L70 156H44Q36 156 36 146V70Q36 60 44 60Z' "][b],
+ E=[[[-20,-6],[20,-6]],[[0,-8]],[[-22,-2],[0,-14],[22,-2]]][c],k=c===1?1.7:1;
+ s+="<ellipse cx='100' cy='184' rx='44' ry='6' fill='#000' opacity='.18'/>"+body+"fill='"+col+"'"+ln+"/>";
+ if(b===2)s+="<rect x='52' y='56' width='14' height='114' rx='6' fill='"+dd+"' opacity='.5'/><path d='M72 162H144' stroke='#fff' stroke-width='4' opacity='.5'/><path d='M126 170V186L134 180L142 186V170Z' fill='#ff5d73' stroke='"+dd+"' stroke-width='3'/>";
+ s+="<ellipse cx='80' cy='"+(t+24)+"' rx='16' ry='8' fill='#fff' opacity='.4' transform='rotate(-25 80 "+(t+24)+")'/>";
+ s+="<g transform='translate(100 "+fy+")'>";
+ E.forEach(function(p){s+="<g transform='translate("+p[0]+" "+p[1]+") scale("+k+")'>"+eye(m,p[0]>0?-1:1)+"</g>"});
+ s+=mouth(m,j)+"</g>";
+ if(a===2){E.forEach(function(p){s+="<circle cx='"+(100+p[0])+"' cy='"+(fy+p[1])+"' r='"+(c===1?25:15)+"' fill='#fff' fill-opacity='.18' stroke='#6b4423' stroke-width='3.5'/>"});
+  if(E.length>1)s+="<path d='M"+(100+E[0][0]+15)+" "+(fy+E[0][1])+"H"+(100+E[1][0]-15)+"' stroke='#6b4423' stroke-width='3.5'/>"}
+ if(a===0)s+="<path d='M"+(cx-w)+" "+(t+10)+"Q"+cx+" "+(t-40)+" "+(cx+w)+" "+(t+10)+"Z' fill='#8a5a2b' stroke='#4a2f12' stroke-width='3.5' stroke-linejoin='round'/><rect x='"+(cx-w*.7)+"' y='"+(t-6)+"' width='"+(w*1.4)+"' height='7' fill='#e9c46a'/><ellipse cx='"+cx+"' cy='"+(t+10)+"' rx='"+(w+10)+"' ry='6' fill='#a86f3a' stroke='#4a2f12' stroke-width='3.5'/>";
+ if(a===1)s+="<g transform='translate("+(cx-w*.55)+" "+(t+2)+") rotate(-28)'><rect x='-6' y='-40' width='12' height='36' rx='2' fill='#ffd23f' stroke='#8a5a00' stroke-width='3'/><path d='M-6 -4L0 12L6 -4Z' fill='#f5d9b0' stroke='#8a5a00' stroke-width='3' stroke-linejoin='round'/><rect x='-6' y='-48' width='12' height='9' rx='3' fill='#ff7a9c' stroke='#8a5a00' stroke-width='3'/></g>";
+ if(bs)s+="<path d='M78 "+(t+6)+"L80 "+(t-20)+"L91 "+(t-6)+"L100 "+(t-24)+"L109 "+(t-6)+"L120 "+(t-20)+"L122 "+(t+6)+"Z' fill='#ffd23f' stroke='#8a5a00' stroke-width='3' stroke-linejoin='round'/>";
+ return "<svg viewBox='0 0 200 190' width='"+sz+"' height='"+Math.round(sz*.95)+"' role='img' aria-label='Monster'>"+s+"</svg>"}
+var DK=(function(){
+var ST={c:{},days:{}},S={lv:0,mi:0,mhp:3,mx:3,hp:5,q:null,weak:[],seen:[],busy:false,got:[]};
+function load(){S.got=ld("pa-dkkoleksi",[]);ST=ld("pa-dkstat",{c:{},days:{}})}load();
+function ally(m){return monSVG(FAV(),m,64,FAV()%3===2,(monI()*47+180)%360)}
+function pal(ok){var p=document.getElementById("pal");if(!p||FAV()<0)return;p.innerHTML=ally(ok?"laugh":"sad");p.className="pal";void p.offsetWidth;p.className="pal "+(ok?"cheer":"sadp")}
+var LVN=["Detektif Magang","Detektif Muda","Detektif Senior"],LVD=["Kelas 2-3","Kelas 4-5","Kelas 5-6"];
+var DM=[1,5,9,14,18,22,27,31,35],DN=["Hurufo","Eja Nakal","Ratu Kata","Imbuhan","Sinon","Raja Kalimat","Paragrafo","Baku Kaku","Kamus Besar"];
+var CAT=[["ej","Ejaan"],["im","Imbuhan"],["mk","Makna kata"],["kl","Tata bahasa"],["bc","Membaca"],["hk","Huruf kacau"]];
+
+/* ---------- bank soal ---------- */
+var EJ=[["izin","ijin",0],["silakan","silahkan",0],["zaman","jaman",0],["Jumat","Jum'at",0],["apotek","apotik",0],["tahu","tau",0],["bagaimana","gimana",0],["tidak","nggak",0],["sudah","udah",0],["sangat","banget",0],["pikir","fikir",0],["bohong","boong",0],["terima kasih","makasih",0],
+["nasihat","nasehat",1],["jadwal","jadual",1],["risiko","resiko",1],["objek","obyek",1],["kualitas","kwalitas",1],["teknik","tehnik",1],["praktik","praktek",1],["mengubah","merubah",1],["kaus","kaos",1],["atlet","atlit",1],["Februari","Pebruari",1],["November","Nopember",1],["terampil","trampil",1],["napas","nafas",1],["sopir","supir",1],["ijazah","ijasah",1],["khawatir","kuatir",1],["aktif","aktip",1],["telepon","telpon",1],["subuh","shubuh",1],
+["analisis","analisa",2],["hakikat","hakekat",2],["kuitansi","kwitansi",2],["andal","handal",2],["aktivitas","aktifitas",2],["frekuensi","frekwensi",2],["sistem","sistim",2],["manajemen","menejemen",2],["konsekuen","konsekwen",2],["kuantitas","kwantitas",2],["lembap","lembab",2],["asas","azas",2],["efektif","efektip",2],["motif","motip",2],["kreatif","kreatip",2],["positif","positip",2],["azan","adzan",2]];
+var IM=[["main","bermain","ber",0],["lari","berlari","ber",0],["jalan","berjalan","ber",0],["ajar","belajar","ber",0],["kerja","bekerja","ber",0],["renang","berenang","ber",0],["sepeda","bersepeda","ber",0],["nyanyi","bernyanyi","ber",0],["baris","berbaris","ber",0],["bicara","berbicara","ber",0],["hitung","berhitung","ber",0],["doa","berdoa","ber",0],["libur","berlibur","ber",0],["tanya","bertanya","ber",0],["sekolah","bersekolah","ber",0],["dagang","berdagang","ber",0],["tamu","bertamu","ber",0],
+["tulis","menulis","me",1],["sapu","menyapu","me",1],["baca","membaca","me",1],["ambil","mengambil","me",1],["kirim","mengirim","me",1],["beli","membeli","me",1],["cuci","mencuci","me",1],["tolong","menolong","me",1],["dengar","mendengar","me",1],["gambar","menggambar","me",1],["bantu","membantu","me",1],["tanam","menanam","me",1],["jahit","menjahit","me",1],["lukis","melukis","me",1],["masak","memasak","me",1],["sikat","menyikat","me",1],["tonton","menonton","me",1],["siram","menyiram","me",1],["buka","membuka","me",1],["tutup","menutup","me",1],["tangis","menangis","me",1],["tari","menari","me",1],["lihat","melihat","me",1],["cari","mencari","me",1],["jual","menjual","me",1],["petik","memetik","me",1],["gunting","menggunting","me",1],
+["pukul","memukul","me",2],["nyanyi","menyanyi","me",2],["tangkap","menangkap","me",2],["pakai","memakai","me",2],["panjat","memanjat","me",2],["ketik","mengetik","me",2],["setrika","menyetrika","me",2],["pel","mengepel","me",2],["cat","mengecat","me",2],["lap","mengelap","me",2],
+["tani","petani","pe",2],["tulis","penulis","pe",2],["main","pemain","pe",2],["jual","penjual","pe",2],["ajar","pengajar","pe",2],["lari","pelari","pe",2],["tari","penari","pe",2],["nyanyi","penyanyi","pe",2],["tolong","penolong","pe",2],["lukis","pelukis","pe",2],["jahit","penjahit","pe",2],["buru","pemburu","pe",2],["jaga","penjaga","pe",2],["beli","pembeli","pe",2],["baca","pembaca","pe",2],
+["bersih","kebersihan","kean",2],["sehat","kesehatan","kean",2],["adil","keadilan","kean",2],["baik","kebaikan","kean",2],["cantik","kecantikan","kean",2],["pandai","kepandaian","kean",2],["sedih","kesedihan","kean",2],["senang","kesenangan","kean",2]];
+var AN=[["tinggi","rendah",0],["besar","kecil",0],["terang","gelap",0],["naik","turun",0],["panas","dingin",0],["ramai","sepi",0],["kering","basah",0],["jauh","dekat",0],["siang","malam",0],["gemuk","kurus",0],["buka","tutup",0],["masuk","keluar",0],["datang","pergi",0],["sehat","sakit",0],["benar","salah",0],["penuh","kosong",0],["muda","tua",0],["mudah","sulit",0],
+["rajin","malas",1],["kaya","miskin",1],["berani","takut",1],["jujur","curang",1],["bersih","kotor",1],["maju","mundur",1],["tebal","tipis",1],["dalam","dangkal",1],["murah","mahal",1],["kuat","lemah",1],["asli","palsu",1],["untung","rugi",1],["awal","akhir",1],["menang","kalah",1],["rapi","berantakan",1],["sempit","luas",1],
+["hemat","boros",2],["kuno","modern",2],["ramah","ketus",2],["gembira","murung",2],["terbuka","tertutup",2],["bertemu","berpisah",2],["tenang","gaduh",2],["tumpul","tajam",2],["jernih","keruh",2],["cekatan","lamban",2],["sederhana","mewah",2]];
+var SN=[["pintar","pandai",0],["cepat","lekas",0],["murid","siswa",0],["ayah","bapak",0],["ibu","bunda",0],
+["cantik","indah",1],["gembira","senang",1],["bohong","dusta",1],["rajin","tekun",1],["marah","berang",1],["takut","gentar",1],["pakaian","busana",1],
+["lucu","jenaka",2],["luas","lapang",2],["hening","sunyi",2],["bijaksana","arif",2],["cemas","khawatir",2]];
+var HK=[["buku",0],["meja",0],["sapi",0],["kuda",0],["ikan",0],["bola",0],["roti",0],["topi",0],["baju",0],["mata",0],["bulan",0],["jeruk",0],["kursi",0],
+["sekolah",1],["kucing",1],["pelangi",1],["jendela",1],["pensil",1],["sepatu",1],["tangan",1],["pisang",1],["belajar",1],["gembira",1],["pesawat",1],
+["matahari",2],["bermain",2],["pahlawan",2],["kebersihan",2],["persahabatan",2],["perpustakaan",2],["pengetahuan",2],["pemandangan",2],["kemerdekaan",2],["pendidikan",2]];
+var T3=["kata kerja","kata benda","kata sifat","kata bilangan"];
+var KL=[["Kucing itu ___ tikus di dapur.","mengejar",["mengajar","mengambil","menjahit"],0],
+["Cuaca sangat ___, jadi kami memakai jaket.","dingin",["panas","ramai","manis"],0],
+["Aku minum ___ saat haus.","air",["batu","kursi","sepatu"],0],
+["Ibu membeli apel, jeruk, ___ pisang di pasar.","dan",["tetapi","karena","supaya"],0],
+["Kamu mau minum teh ___ kopi?","atau",["tetapi","karena","supaya"],0],
+["Huruf pertama di awal kalimat ditulis dengan huruf ...","kapital",["kecil","miring","tebal"],0],
+["Kata “lari” termasuk kata ...","kata kerja",["kata benda","kata sifat","kata bilangan"],0],
+["Kata “merah” termasuk kata ...","kata sifat",["kata kerja","kata benda","kata bilangan"],0],
+["Kata “kucing” termasuk kata ...","kata benda",["kata kerja","kata sifat","kata bilangan"],0],
+["Kata tanya untuk menanyakan orang adalah ...","siapa",["kapan","mengapa","di mana"],0],
+["Kata tanya untuk menanyakan tempat adalah ...","di mana",["siapa","kapan","mengapa"],0],
+["Tanda baca di akhir kalimat berita adalah ...","tanda titik",["tanda tanya","tanda seru","tanda koma"],0],
+["Budi tidak masuk sekolah ___ ia sakit.","karena",["tetapi","atau","supaya"],1],
+["Aku belajar giat ___ naik kelas.","supaya",["tetapi","atau","meskipun"],1],
+["Hujan turun deras, ___ kami tetap bermain bola.","tetapi",["karena","atau","supaya"],1],
+["___ rajin berlatih, dia menjadi juara.","Karena",["Tetapi","Atau","Sambil"],1],
+["Ayah naik motor, ___ ibu naik angkot.","sedangkan",["karena","supaya","atau"],1],
+["Kita harus makan sayur ___ badan sehat.","supaya",["tetapi","atau","sebelum"],1],
+["Aku suka apel ___ adikku suka jeruk.","sedangkan",["atau","supaya","sehingga"],1],
+["Kakak sedang sakit ___ ia tidak masuk sekolah.","sehingga",["tetapi","atau","sedangkan"],1],
+["Mau pergi sekarang ___ nanti sore?","atau",["karena","tetapi","supaya"],1],
+["Dia tersenyum ___ hatinya sedih.","tetapi",["supaya","atau","sebelum"],1],
+["Kata “tiga” termasuk kata ...","kata bilangan",["kata kerja","kata benda","kata sifat"],1],
+["Kata “saya” termasuk kata ...","kata ganti",["kata kerja","kata benda","kata sifat"],1],
+["Kata tanya untuk menanyakan jumlah adalah ...","berapa",["siapa","kapan","di mana"],1],
+["Tanda baca di akhir kalimat seru adalah ...","tanda seru",["tanda titik","tanda tanya","tanda koma"],1],
+["Huruf kapital dipakai di awal penulisan ...","nama orang",["nama buah","nama warna","kata kerja"],1],
+["Kalimat yang penulisannya benar adalah ...","Adik pergi ke Bandung.",["adik pergi ke bandung.","Adik pergi kebandung.","Adik pergi ke Bandung"],1],
+["Kalimat yang penulisannya benar adalah ...","Ibu memasak di dapur.",["ibu memasak di dapur.","Ibu memasak didapur.","Ibu memasak di dapur"],1],
+["Kata tanya untuk menanyakan sebab adalah ...","mengapa",["kapan","siapa","di mana"],2],
+["Kata tanya untuk menanyakan waktu adalah ...","kapan",["siapa","mengapa","di mana"],2],
+["Kata tanya untuk menanyakan cara adalah ...","bagaimana",["siapa","kapan","di mana"],2],
+["Tanda baca di akhir kalimat tanya adalah ...","tanda tanya",["titik","koma","tanda seru"],2],
+["Kata “makan” termasuk kata ...","kata kerja",["kata benda","kata sifat","kata bilangan"],2],
+["Kata “indah” termasuk kata ...","kata sifat",["kata kerja","kata benda","kata bilangan"],2],
+["Kata “buku” termasuk kata ...","kata benda",["kata kerja","kata sifat","kata bilangan"],2],
+["Kalimat “Tolong bukakan pintu!” adalah kalimat ...","perintah",["tanya","berita","sapaan"],2],
+["Kalimat berikut yang merupakan kalimat tanya adalah ...","Siapa yang memecahkan gelas itu?",["Tolong ambilkan gelas itu.","Gelas itu pecah tadi pagi.","Wah, gelas itu cantik sekali!"],2],
+["Kalimat berikut yang merupakan kalimat perintah adalah ...","Tutup pintu itu sekarang.",["Pintu itu terbuka lebar.","Siapa yang membuka pintu?","Wah, pintunya besar sekali!"],2],
+["Kalimat berikut yang merupakan kalimat seru adalah ...","Wah, indah sekali pemandangan ini!",["Pemandangan ini sangat indah.","Di mana pemandangan itu?","Lihatlah pemandangan itu."],2],
+["Arti peribahasa “bersatu kita teguh” adalah ...","persatuan membuat kita kuat",["bersatu itu melelahkan","sendirian lebih baik","bertengkar itu wajar"],2],
+["Arti peribahasa “rajin pangkal pandai” adalah ...","rajin belajar membuat kita pandai",["pandai membuat kita malas","rajin itu melelahkan","pandai tanpa belajar"],2],
+["Arti peribahasa “malu bertanya sesat di jalan” adalah ...","kalau tidak bertanya kita bisa salah arah",["bertanya membuat kita tersesat","jalan itu selalu lurus","malu itu baik"],2],
+["Arti peribahasa “sedikit demi sedikit lama-lama menjadi bukit” adalah ...","hal kecil yang dilakukan terus akan menjadi besar",["bukit itu sangat tinggi","kerja sedikit sudah cukup","sedikit itu tidak berguna"],2],
+["Arti peribahasa “berakit-rakit ke hulu, berenang-renang ke tepian” adalah ...","bersusah-susah dahulu, bersenang-senang kemudian",["bersenang-senang dahulu, bersusah kemudian","berenang itu menyenangkan","hulu itu dekat tepian"],2]];
+var P1="Ani memiliki kucing bernama Mimi. Setiap pagi Ani memberi Mimi susu.",P2="Pak Tani bangun sebelum matahari terbit. Ia pergi ke sawah membawa cangkul. Sore hari ia pulang dengan badan lelah tetapi senang.",P3="Dina menutup bukunya dengan wajah murung. Nilai ulangannya lebih rendah dari teman-temannya. Ia memutuskan belajar lebih giat setiap malam.",
+P4="Budi dan Sinta pergi ke kebun binatang. Mereka melihat gajah, jerapah, dan monyet. Budi paling suka melihat gajah.",P5="Pagi itu Ibu membuat nasi goreng. Ayah menyiapkan teh hangat. Adik menata piring di meja makan.",P6="Di taman ada kolam kecil. Banyak ikan berenang di dalamnya. Anak-anak memberi makan ikan setiap sore.",
+P7="Lebah mengumpulkan nektar dari bunga. Nektar dibawa ke sarang, lalu diolah menjadi madu.",P8="Pada hari Minggu, warga bergotong royong membersihkan lingkungan. Bapak-bapak memotong rumput, ibu-ibu menyapu jalan, dan anak-anak mengumpulkan sampah. Setelah selesai, lingkungan menjadi bersih dan nyaman.",P9="Dodi lupa membawa bekal. Temannya, Wawan, membagi roti miliknya menjadi dua. Dodi sangat berterima kasih.",
+P10="Setiap hari Minggu, Pak Hasan membersihkan selokan di depan rumahnya. Beberapa tetangga mulai ikut membantu. Kini jalan di kampung itu tidak lagi tergenang air saat hujan.",P11="Tumbuhan membutuhkan cahaya matahari, air, dan udara untuk tumbuh. Jika daun tidak terkena cahaya matahari, tumbuhan menjadi pucat dan lemah.",P12="Rani selalu menyisihkan sebagian uang sakunya setiap hari. Setelah tiga bulan, tabungannya cukup untuk membeli sepatu baru. Ia senang karena tidak perlu meminta kepada orang tuanya.",P13="Banjir sering terjadi karena sampah menyumbat saluran air. Selain itu, hutan yang gundul tidak mampu menyerap air hujan.";
+var BC=[[P1,"Siapa nama kucing Ani?","Mimi",["Susu","Pagi","Ani"],0],
+[P1,"Apa yang Ani berikan kepada Mimi setiap pagi?","Susu",["Ikan","Nasi","Roti"],0],
+["Rudi membawa payung ke sekolah karena langit mendung.","Mengapa Rudi membawa payung?","Langit mendung",["Hari panas","Payungnya baru","Ingin bermain"],0],
+[P4,"Hewan apa yang paling disukai Budi?","Gajah",["Jerapah","Monyet","Singa"],0],
+[P4,"Ke mana Budi dan Sinta pergi?","Kebun binatang",["Pasar","Sekolah","Taman bermain"],0],
+[P5,"Siapa yang menata piring di meja makan?","Adik",["Ibu","Ayah","Kakak"],0],
+[P5,"Apa yang dibuat Ibu pagi itu?","Nasi goreng",["Teh hangat","Roti bakar","Bubur"],0],
+[P6,"Kapan anak-anak memberi makan ikan?","Setiap sore",["Setiap pagi","Setiap malam","Setiap siang"],0],
+[P6,"Apa yang ada di dalam kolam?","Ikan",["Bebek","Katak","Kura-kura"],0],
+[P2,"Apa yang dibawa Pak Tani ke sawah?","Cangkul",["Payung","Buku","Jala"],1],
+[P2,"Kapan Pak Tani pulang?","Sore hari",["Pagi hari","Tengah malam","Siang hari"],1],
+["Ulat berubah menjadi kepompong lebih dulu. Setelah beberapa hari, kepompong menetas menjadi kupu-kupu.","Apa yang terjadi setelah ulat menjadi kepompong?","Menetas menjadi kupu-kupu",["Menjadi ulat lagi","Menjadi belalang","Mati dan hilang"],1],
+[P7,"Apa yang dikumpulkan lebah dari bunga?","Nektar",["Madu","Air","Daun"],1],
+[P7,"Nektar diolah lebah menjadi apa?","Madu",["Susu","Gula pasir","Teh"],1],
+[P8,"Apa yang dilakukan anak-anak saat gotong royong?","Mengumpulkan sampah",["Memotong rumput","Menyapu jalan","Mengecat pagar"],1],
+[P8,"Bagaimana keadaan lingkungan setelah gotong royong?","Bersih dan nyaman",["Kotor dan bau","Ramai dan bising","Gelap dan sepi"],1],
+[P9,"Mengapa Dodi berterima kasih kepada Wawan?","Wawan membagi rotinya",["Wawan meminjamkan buku","Wawan mengantarnya pulang","Wawan memberi uang"],1],
+[P9,"Bagaimana sifat Wawan?","Suka berbagi",["Pelit","Pemarah","Pemalas"],1],
+[P3,"Bagaimana perasaan Dina saat menutup buku?","Sedih",["Senang","Bangga","Bosan"],2],
+[P3,"Apa yang Dina putuskan?","Belajar lebih giat",["Pindah sekolah","Berhenti ulangan","Menyontek"],2],
+[P10,"Apa manfaat selokan yang bersih?","Air hujan tidak menggenang",["Jalan menjadi sempit","Tetangga pindah rumah","Rumah menjadi mahal"],2],
+[P10,"Apa yang dapat kita simpulkan dari bacaan?","Perbuatan baik dapat diikuti orang lain",["Selokan tidak penting","Hujan selalu menyebabkan banjir","Tetangga tidak peduli"],2],
+[P11,"Apa yang terjadi jika daun tidak terkena cahaya matahari?","Tumbuhan menjadi pucat dan lemah",["Tumbuhan menjadi lebih besar","Daun berubah menjadi bunga","Tumbuhan berbuah banyak"],2],
+[P11,"Apa saja yang dibutuhkan tumbuhan untuk tumbuh?","Cahaya matahari, air, dan udara",["Pasir, batu, dan api","Gula, garam, dan minyak","Hanya air"],2],
+[P12,"Berapa lama Rani menabung hingga bisa membeli sepatu?","Tiga bulan",["Tiga hari","Tiga minggu","Tiga tahun"],2],
+[P12,"Sifat apa yang dimiliki Rani?","Hemat dan tekun menabung",["Boros dan pemalas","Pemarah dan sombong","Penakut dan pelupa"],2],
+[P13,"Apa dua penyebab banjir menurut bacaan?","Sampah menyumbat saluran air dan hutan gundul",["Hujan ringan dan sungai dalam","Rumah tinggi dan jalan sempit","Pohon rimbun dan air jernih"],2],
+["Sampah plastik yang dibuang ke sungai membuat air tercemar. Ikan pun sulit hidup di sana. Karena itu, kita harus membuang sampah pada tempatnya.","Apa pesan utama bacaan tersebut?","Buang sampah pada tempatnya",["Ikan hidup di mana saja","Sungai harus dikeringkan","Plastik itu mahal"],2]];
+
+/* ---------- pembuat soal ---------- */
+function pk(a,L){var x=a.filter(function(i){return i[i.length-1]===L}),y=L>0?a.filter(function(i){return i[i.length-1]===L-1}):[],p=(y.length&&Math.random()<.3)?y:x;return p[rnd(0,p.length-1)]}
+function qEj(L){var e=pk(EJ,L),o=shuffle(EJ.filter(function(x){return x!==e&&x[2]<=L})).slice(0,3),neg=Math.random()<.5;
+ return{t:"ej",key:"ej"+e[0]+neg,sz:"mid",text:"<small>Ejaan</small>Mana penulisan yang <b>"+(neg?"tidak baku":"baku")+"</b>?",ans:neg?e[1]:e[0],
+ opts:shuffle([neg?e[1]:e[0]].concat(o.map(function(x){return neg?x[0]:x[1]}))),ex:"Penulisan baku: <b>"+e[0]+"</b>, bukan "+e[1]+"."}}
+function qIm(L){var e=pk(IM,L),P={ber:["ber","be","bel","per","ter","me"],me:["me","mem","men","meng","meny"],pe:["pe","pem","pen","peng","peny"],kean:["ke","per","pe","ber","me"]},kn=e[2]==="kean",
+ d=P[e[2]].map(function(p){return kn?p+e[0]+"an":p+e[0]}).filter(function(x,i,a){return x!==e[1]&&a.indexOf(x)===i}),lb=kn?"ke- dan akhiran -an":e[2]+"-";
+ return{t:"im",key:"im"+e[0]+e[2],sz:"mid",text:"<small>Imbuhan</small>Kata dasar “"+e[0]+"” diberi awalan <b>"+lb+"</b> menjadi …",ans:e[1],
+ opts:shuffle([e[1]].concat(shuffle(d).slice(0,3))),ex:"“"+e[0]+"” + "+lb+" = <b>"+e[1]+"</b>"}}
+function qHk(L){var e=pk(HK,L),w=e[0].toUpperCase(),a,n=0;do{a=shuffle(w.split(""))}while(a.join("")===w&&++n<20);
+ var pool=HK.filter(function(x){return x!==e&&x[1]<=L&&Math.abs(x[0].length-e[0].length)<=1});if(pool.length<3)pool=HK.filter(function(x){return x!==e});
+ return{t:"hk",key:"hk"+e[0],sz:"mid",text:"<small>Huruf kacau</small>Susun huruf <b>"+a.join(" ")+"</b> menjadi kata …",ans:e[0],
+ opts:shuffle([e[0]].concat(shuffle(pool).slice(0,3).map(function(x){return x[0]}))),ex:"Susunan yang benar: <b>"+e[0]+"</b>."}}
+function qMk(L){var an=Math.random()<.6,A=an?AN:SN,e=pk(A,L),f=Math.random()<.5,w=f?e[0]:e[1],a=f?e[1]:e[0],
+ pool=[];A.forEach(function(x){if(x!==e)pool.push(x[0],x[1])});
+ return{t:"mk",key:"mk"+e[0]+an+f,sz:"mid",text:"<small>Makna kata</small>"+(an?"Lawan kata":"Persamaan kata")+" “"+w+"” adalah …",ans:a,
+ opts:shuffle([a].concat(shuffle(pool).slice(0,3))),ex:(an?"Lawan kata":"Persamaan kata")+" “"+w+"” adalah <b>"+a+"</b>."}}
+function qKl(L){var e=pk(KL,L);return{t:"kl",key:"kl"+e[0],sz:"mid",text:"<small>Tata bahasa</small>"+e[0].replace("___","_____"),ans:e[1],
+ opts:shuffle([e[1]].concat(e[2])),ex:e[0].indexOf("___")>-1?e[0].replace("___","<b>"+e[1]+"</b>"):"Jawaban: <b>"+e[1]+"</b>."}}
+function qBc(L){var e=pk(BC,L);return{t:"bc",key:"bc"+e[0].slice(0,12)+e[1],sz:"sm",text:"<small>Berkas kasus</small>"+e[0]+"<br><b>"+e[1]+"</b>",ans:e[2],
+ opts:shuffle([e[2]].concat(e[3])),ex:"Jawabannya: <b>"+e[2]+"</b>. Baca lagi bacaannya pelan-pelan."}}
+function gen(){var n=0,q,w;
+ do{w=S.weak.length&&Math.random()<.35;
+  if(w){q=Object.assign({},S.weak[rnd(0,S.weak.length-1)]);q.opts=shuffle(q.opts.slice())}else q=[qEj,qIm,qMk,qKl,qBc,qHk][rnd(0,5)](S.lv);n++}
+ while(n<40&&S.seen.slice(w?-4:0).indexOf(q.key)>-1);
+ S.seen.push(q.key);if(S.seen.length>30)S.seen.shift();return q}
+
+/* ---------- tampilan ---------- */
+function monI(){return DM[S.lv*3+S.mi]}
+function mS(m){var b=S.mi===2;return dkSVG(S.lv*3+S.mi,m,b?160:130,b)}
+function react(ok){var m=document.getElementById("mon"),a=document.getElementById("arena");if(!m)return;m.innerHTML=mS(ok?"sad":"laugh");
+ var L=ok?["Aduh! 😭","Ampun... 🥺","Sakit! 😖","Huhu... 😢"]:["Hahaha! 😆","Salah dong~ 🤪","Hihihi! 😜","Yee, meleset! 😝"],t=L[rnd(0,3)];
+ say(t,ok);pal(ok);
+ if(a){var b=document.createElement("div");b.className="bub";b.textContent=t;a.appendChild(b);setTimeout(function(){b.remove()},1500);
+  (ok?["💧","😢","💧"]:["😂","🤣","😂"]).forEach(function(e){var s=document.createElement("span");s.className="fx";s.textContent=e;s.style.left=rnd(38,58)+"%";s.style.top=ok?"40%":"30%";
+   s.style.setProperty("--dx",rnd(-40,40)+"px");s.style.setProperty("--dy",(ok?rnd(50,90):rnd(-80,-40))+"px");a.appendChild(s);setTimeout(function(){s.remove()},750)})}
+ if(ok)setTimeout(function(){m.classList.remove("hit");m.classList.add("sad")},450);else m.classList.add("laugh")}
+function menu(){document.documentElement.dataset.game="dk";
+ var shelf=DM.map(function(m,j){var on=S.got.indexOf(j)>-1;return '<div class="cw"><div class="slot '+(on?'on':'off')+'">'+dkSVG(j,"idle",38,j%3===2)+'</div><small>'+(on?DN[j]:"???")+'</small></div>'}).join("");
+ var bars=CAT.map(function(c){var d=ST.c[c[0]]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;return '<div class="row"><span>'+c[1]+'</span><span class="soft">'+(d[0]?p+'% ('+d[1]+'/'+d[0]+')':'belum ada')+'</span></div><div class="meter"><i style="width:'+p+'%"></i></div>'}).join("");
+ app.innerHTML='<div class="top"><button id="hb">← Kampung</button><button class="ib" id="mu" aria-label="Suara" title="Suara">'+(MUTE?ICO.off:ICO.on)+'</button></div><h1>Detektif Kata</h1>'+
+ '<p class="soft">Pencuri kata berkeliaran! Pecahkan kasusnya dengan Bahasa Indonesia yang benar.</p>'+
+ LVN.map(function(n,i){return '<button class="lv" data-lv="'+i+'"><span>'+n+'<small>'+LVD[i]+'</small></span><span>🔍</span></button>'}).join("")+
+ '<p><b>Koleksi pencuri kata</b> <span class="soft">('+S.got.length+'/9)</span></p><div class="shelf">'+shelf+'</div>'+
+ '<h2>Buku catatan detektif</h2><div class="card">'+bars+'</div>';
+ document.getElementById("hb").onclick=hub;document.getElementById("mu").onclick=function(){MUTE=!MUTE;sv("pa-mute",MUTE);snd("tap");menu()};
+ app.querySelectorAll("[data-lv]").forEach(function(b){b.onclick=function(){snd("tap");S.lv=+b.dataset.lv;S.mi=0;S.hp=5;S.weak=[];monster()}});
+}
+function monster(){S.mx=S.mi===2?5:3;S.mhp=S.mx;next()}
+function next(){S.q=gen();S.busy=false;battle()}
+function battle(){var q=S.q,lg=q.opts.some(function(o){return o.length>9});
+ app.innerHTML='<div class="top"><button id="x">← Menu</button><span class="soft">Kasus '+(S.mi+1)+'/3</span><span class="hearts" aria-label="Nyawa '+S.hp+'">'+"❤️".repeat(S.hp)+"🖤".repeat(5-S.hp)+'</span></div>'+
+ '<div class="arena" id="arena"><div class="mon" id="mon">'+mS(S.mhp===1?"nerv":"idle")+'</div>'+(FAV()>=0?'<div class="pal" id="pal">'+ally("idle")+'</div>':'')+'<div><b>'+(S.mi===2?'BOS ':'')+DN[S.lv*3+S.mi]+'</b></div><div class="bar"><i style="width:'+(S.mhp/S.mx*100)+'%"></i></div>'+
+ '<div class="q '+q.sz+'">'+q.text+'</div></div>'+
+ '<div class="opts">'+q.opts.map(function(o){return '<button'+(lg?' class="long"':'')+' data-v="'+esc(o)+'">'+esc(o)+'</button>'}).join("")+'</div><div id="fb"></div>';
+ document.getElementById("x").onclick=menu;
+ app.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){pick(b)}});
+}
+function pick(btn){if(S.busy)return;S.busy=true;
+ var q=S.q,ok=btn.dataset.v===q.ans,mon=document.getElementById("mon"),fb=document.getElementById("fb"),d=ST.c[q.t]=ST.c[q.t]||[0,0],day=dk(new Date());
+ d[0]++;if(ok)d[1]++;ST.days[day]=(ST.days[day]||0)+1;sv("pa-dkstat",ST);
+ app.querySelectorAll("[data-v]").forEach(function(b){if(b.dataset.v===q.ans)b.classList.add("ok")});
+ if(ok){snd("ok");burst();mon.classList.add("hit");react(true);S.mhp--;fb.innerHTML='<div class="fb"><b>Kena! 💥</b></div>';
+  if(S.mhp<=0)setTimeout(function(){mon.classList.add("win");setTimeout(defeated,800)},900);else setTimeout(next,1500);
+ }else{snd("no");react(false);document.getElementById("arena").classList.add("shake");btn.classList.add("no");S.hp--;
+  if(!S.weak.some(function(w){return w.key===q.key}))S.weak.push(q);
+  fb.innerHTML='<div class="fb"><b>Petunjuk detektif:</b>'+q.ex+'</div><div class="center"><button class="go" id="c">'+(S.hp>0?"Lanjut":"Lihat hasil")+'</button></div>';
+  document.getElementById("c").onclick=function(){S.hp>0?next():over()};
+ }}
+function defeated(){var j=S.lv*3+S.mi,b=S.mi===2;
+ if(S.got.indexOf(j)<0){S.got.push(j);sv("pa-dkkoleksi",S.got)}
+ snd("win");
+ if(b){confetti();app.innerHTML='<div class="center"><h1>Kasus terpecahkan! 🎉</h1><p>Semua pencuri kata di level '+LVN[S.lv]+' sudah tertangkap.</p><div class="mon" style="animation:none">'+dkSVG(j,"sad",140,true)+'</div><p class="soft">'+(S.weak.length?"Perlu dilatih lagi: "+S.weak.slice(0,3).map(function(w){return CAT.filter(function(c){return c[0]===w.t})[0][1]}).join(", ")+".":"Tanpa salah sama sekali. Hebat!")+'</p><button class="go" id="m">Kembali ke menu</button></div>';
+  document.getElementById("m").onclick=menu}
+ else{app.innerHTML='<div class="center"><div class="mon" style="animation:none">'+dkSVG(j,"sad",110,false)+'</div><h1>'+DN[j]+' kalah!</h1><p>Pencuri kata masuk koleksimu. Siap lawan berikutnya?</p><button class="go" id="n">Lanjut bertarung</button></div>';
+  document.getElementById("n").onclick=function(){S.mi++;monster()}}}
+function over(){app.innerHTML='<div class="center"><div class="mon" style="animation:none">'+mS("laugh")+'</div><h1>Nyawa habis 😴</h1><p>Tidak apa-apa, detektif hebat pun perlu istirahat. Soal yang tadi sulit akan muncul lagi.</p><button class="go" id="r">Coba lagi</button> <button id="m">Menu</button></div>';
+ document.getElementById("r").onclick=function(){S.hp=5;monster()};document.getElementById("m").onclick=menu}
+
+return{menu:menu,load:load,stat:function(){return ST},got:function(){return S.got},cat:CAT}})();
+
+var WD=[[0,0,48],[1,1,0],[2,2,200],[3,0,330],[1,2,95],[3,1,270],[2,0,25],[0,2,190],[0,1,350]];
+function wSVG(j,m,sz,bs){var d=WD[j%9],b=d[0],a=d[1],h=d[2],c=Math.floor(j/3)%3,col="hsl("+h+",75%,60%)",dd="hsl("+h+",60%,26%)",ln=" stroke='"+dd+"' stroke-width='4' stroke-linejoin='round'",s="",
+ AN=[[100,52,34],[100,56,28],[100,44,28],[100,54,34]][b],cx=AN[0],t=AN[1],w=AN[2],fy=[110,114,122,124][b],
+ E=[[[-20,-6],[20,-6]],[[0,-8]],[[-22,-2],[0,-14],[22,-2]]][c],k=c===1?1.7:1;
+ s+="<ellipse cx='100' cy='184' rx='46' ry='6' fill='#000' opacity='.18'/>";
+ if(b===0)s+="<circle cx='100' cy='112' r='62' fill='"+col+"'"+ln+"/><circle cx='100' cy='112' r='50' fill='none' stroke='#fff' stroke-opacity='.45' stroke-width='3' stroke-dasharray='5 4'/>";
+ if(b===1)s+="<path d='M100 60Q112 46 130 52Q160 62 160 112Q160 166 124 172Q100 176 76 172Q40 166 40 112Q40 62 70 52Q88 46 100 60Z' fill='"+col+"'"+ln+"/><path d='M100 58Q102 38 124 32Q122 52 100 58Z' fill='#3fb950' stroke='#1f6e2c' stroke-width='3.5' stroke-linejoin='round'/>";
+ if(b===2)s+="<path d='M78 74V60Q78 40 100 40Q122 40 122 60V74' fill='none' stroke='"+dd+"' stroke-width='6' stroke-linecap='round'/><path d='M52 72H148L158 170Q158 178 150 178H50Q42 178 42 170Z' fill='"+col+"'"+ln+"/>";
+ if(b===3)s+="<rect x='52' y='72' width='96' height='104' rx='18' fill='"+col+"'"+ln+"/><rect x='44' y='54' width='112' height='24' rx='9' fill='"+dd+"'"+ln+"/>";
+ s+="<ellipse cx='78' cy='"+(t+30)+"' rx='15' ry='8' fill='#fff' opacity='.4' transform='rotate(-25 78 "+(t+30)+")'/>";
+ s+="<g transform='translate(100 "+fy+")'>";
+ E.forEach(function(p){s+="<g transform='translate("+p[0]+" "+p[1]+") scale("+k+")'>"+eye(m,p[0]>0?-1:1)+"</g>"});
+ s+=mouth(m,j)+"</g>";
+ if(a===0)s+="<g transform='translate(138 84) rotate(12)'><path d='M6 0L-4 -16' stroke='#6b4423' stroke-width='2.5'/><path d='M0 0H24L32 12L24 24H0Z' fill='#fff' stroke='#8a5a00' stroke-width='3' stroke-linejoin='round'/><circle cx='6' cy='12' r='2.5' fill='#8a5a00'/><text x='11' y='16' font-size='11' font-weight='800' fill='#c1121f'>Rp</text></g>";
+ if(a===1)s+="<path d='M"+(cx-w)+" "+(t+10)+"Q"+cx+" "+(t-34)+" "+(cx+w)+" "+(t+10)+"Z' fill='#e63946' stroke='#7a1520' stroke-width='3.5' stroke-linejoin='round'/><path d='M"+(cx+w-8)+" "+(t+6)+"Q"+(cx+w+22)+" "+(t+6)+" "+(cx+w+26)+" "+(t+16)+"L"+(cx+w-8)+" "+(t+14)+"Z' fill='#b02a37' stroke='#7a1520' stroke-width='3' stroke-linejoin='round'/>";
+ if(a===2)s+="<path d='M"+(100-24)+" "+(fy+17)+"Q"+(100-12)+" "+(fy+7)+" 100 "+(fy+15)+"Q"+(100+12)+" "+(fy+7)+" "+(100+24)+" "+(fy+17)+"Q"+(100+10)+" "+(fy+24)+" 100 "+(fy+19)+"Q"+(100-10)+" "+(fy+24)+" "+(100-24)+" "+(fy+17)+"Z' fill='#4a2f12'/>";
+ if(bs)s+="<path d='M78 "+(t+6)+"L80 "+(t-20)+"L91 "+(t-6)+"L100 "+(t-24)+"L109 "+(t-6)+"L120 "+(t-20)+"L122 "+(t+6)+"Z' fill='#ffd23f' stroke='#8a5a00' stroke-width='3' stroke-linejoin='round'/>";
+ return "<svg viewBox='0 0 200 190' width='"+sz+"' height='"+Math.round(sz*.95)+"' role='img' aria-label='Monster'>"+s+"</svg>"}
+var WR=(function(){
+var ST={c:{},days:{}},S={lv:0,mi:0,mhp:3,mx:3,hp:5,q:null,weak:[],seen:[],busy:false,got:[]};
+function load(){S.got=ld("pa-wrkoleksi",[]);ST=ld("pa-wrstat",{c:{},days:{}})}load();
+function ally(m){return monSVG(FAV(),m,64,FAV()%3===2,(monI()*47+180)%360)}
+function pal(ok){var p=document.getElementById("pal");if(!p||FAV()<0)return;p.innerHTML=ally(ok?"laugh":"sad");p.className="pal";void p.offsetWidth;p.className="pal "+(ok?"cheer":"sadp")}
+var LVN=["Penjaga Warung","Pemilik Warung","Juragan Warung"],LVD=["Kelas 2-3","Kelas 4-5","Kelas 5-6"];
+var DM=[1,5,9,14,18,22,27,31,35],DN=["Koin Nakal","Apel Rewel","Ratu Kantong","Celengan Pelit","Tomat Penawar","Raja Toples","Kantong Licik","Koin Raksasa","Bos Kasir"];
+var CAT=[["hg","Harga & total"],["kb","Kembalian"],["nu","Nilai uang"],["jm","Jam & waktu"],["sa","Satuan ukuran"],["uj","Untung & diskon"]];
+
+/* ---------- pembuat soal ---------- */
+var ITM=[["permen",500,2000],["kerupuk",1000,3000],["pensil",1500,4000],["penghapus",1000,3000],["roti",3000,8000],["buku tulis",3000,8000],["susu kotak",4000,9000],["es krim",2000,6000],["pisang goreng",1000,4000],["teh botol",3000,6000]],NMP=["Ibu","Ayah","Kakak","Budi","Sari","Pak Joko","Bu Ani"];
+function rp(n){return "Rp"+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".")}
+function fn(n){var s=(Math.round(n*1000)/1000).toString().split(".");return s[0].replace(/\B(?=(\d{3})+(?!\d))/g,".")+(s[1]?","+s[1]:"")}
+function oN(ans,ex,fmt){var c=ex.filter(function(v,i){return v>0&&v!==ans&&ex.indexOf(v)===i}),k=1;while(c.length<3){var v=ans+(++k)*(ans>9?Math.max(1,Math.round(ans/10)):1);if(c.indexOf(v)<0&&v!==ans)c.push(v)}
+ return shuffle([ans].concat(shuffle(c).slice(0,3))).map(fmt)}
+function uo(a,c){c=c.filter(function(v,i){return v!==a&&c.indexOf(v)===i});return shuffle([a].concat(c.slice(0,3)))}
+function st(a,k){var r=[];k.forEach(function(x){r.push(a+x,a-x)});return r}
+function itm(lo,hi){var t=ITM[rnd(0,ITM.length-1)],a=Math.max(t[1],lo||0),b=Math.max(a,Math.min(t[2],hi||t[2]));return [t[0],a+500*rnd(0,(b-a)/500)]}
+function two(){var a=itm(),b;do{b=itm()}while(b[0]===a[0]);return [a,b]}
+function who(){return NMP[rnd(0,NMP.length-1)]}
+function mk(t,text,ans,opts,ex,sz){return{t:t,key:t+text,sz:sz||"mid",text:text,ans:ans,opts:opts,ex:ex}}
+function qHg(L){var p=two(),a=p[0],b=p[1],n=who(),q1=rnd(2,5),q2=rnd(2,4),x;
+ if(L===0){x=a[1]+b[1];return mk("hg","<small>Harga & total</small>Di warung, "+a[0]+" seharga "+rp(a[1])+" dan "+b[0]+" seharga "+rp(b[1])+". Berapa harga keduanya?",rp(x),oN(x,st(x,[500,1000,2000]),rp),rp(a[1])+" + "+rp(b[1])+" = <b>"+rp(x)+"</b>")}
+ if(L===1){if(Math.random()<.4){x=a[1];return mk("hg","<small>Harga & total</small>"+q1+" "+a[0]+" harganya "+rp(q1*a[1])+". Berapa harga satu "+a[0]+"?",rp(x),oN(x,st(x,[500,1000,q1*100]),rp),rp(q1*a[1])+" ÷ "+q1+" = <b>"+rp(x)+"</b>")}
+  x=q1*a[1];return mk("hg","<small>Harga & total</small>"+n+" membeli "+q1+" "+a[0]+" seharga "+rp(a[1])+" per buah. Berapa yang harus dibayar?",rp(x),oN(x,[x+a[1],x-a[1],x+500*q1,a[1]+q1],rp),q1+" × "+rp(a[1])+" = <b>"+rp(x)+"</b>")}
+ x=q1*a[1]+q2*b[1];return mk("hg","<small>Harga & total</small>"+n+" membeli "+q1+" "+a[0]+" @"+rp(a[1])+" dan "+q2+" "+b[0]+" @"+rp(b[1])+". Berapa total belanjanya?",rp(x),oN(x,[q1*a[1],q2*b[1],x+a[1],x-b[1],x+1000],rp),q1+" × "+rp(a[1])+" = "+rp(q1*a[1])+"<br>"+q2+" × "+rp(b[1])+" = "+rp(q2*b[1])+"<br>Jumlah: <b>"+rp(x)+"</b>","sm")}
+function qKb(L){var P=[[5000,10000],[20000,50000],[50000,100000]][L],p=P[rnd(0,1)],c=500*rnd(Math.round(p*.3/500),p/500-1),x=p-c,i=itm();
+ return mk("kb","<small>Kembalian</small>"+who()+" membeli "+i[0]+" dan barang lain seharga "+rp(c)+". Ia membayar dengan uang "+rp(p)+". Berapa uang kembaliannya?",rp(x),oN(x,st(x,L>0?[500,1000,5000]:[500,1000,2000]).concat([p+c]),rp),rp(p)+" − "+rp(c)+" = <b>"+rp(x)+"</b>")}
+function qNu(L){var l=[2000,5000,10000],k=[500,1000],a=l[rnd(0,2)],b=k[rnd(0,1)],n=rnd(1,3),x;
+ if(L===0){x=a+n*b;return mk("nu","<small>Nilai uang</small>1 lembar "+rp(a)+" dan "+n+" koin "+rp(b)+". Berapa jumlah uangnya?",rp(x),oN(x,st(x,[500,1000,b]),rp),rp(a)+" + "+n+" × "+rp(b)+" = <b>"+rp(x)+"</b>")}
+ if(L===1){var c=[10000,20000][rnd(0,1)],m=rnd(2,3);x=m*a+c+n*b;return mk("nu","<small>Nilai uang</small>"+m+" lembar "+rp(a)+", 1 lembar "+rp(c)+", dan "+n+" koin "+rp(b)+". Berapa jumlah uangnya?",rp(x),oN(x,st(x,[500,1000,a]),rp),m+" × "+rp(a)+" = "+rp(m*a)+"<br>"+rp(m*a)+" + "+rp(c)+" + "+n+" × "+rp(b)+" = <b>"+rp(x)+"</b>","sm")}
+ var u=[5000,10000,20000][rnd(0,2)],q=rnd(3,9),fm=function(v){return v+" lembar"};
+ return mk("nu","<small>Nilai uang</small>Untuk membayar "+rp(u*q)+", berapa lembar uang "+rp(u)+" yang dibutuhkan?",fm(q),oN(q,[q+1,q-1,q+2,q-2,q*2],fm),rp(u*q)+" ÷ "+rp(u)+" = <b>"+q+" lembar</b>")}
+function tm(h,m){return ("0"+h).slice(-2)+"."+("0"+m).slice(-2)}
+function du(h,m){return h+" jam"+(m?" "+m+" menit":"")}
+function clk(h,m){var a=(h%12+m/60)*30,b=m*6,t="",i,hx=function(d,l){var r=(d-90)*Math.PI/180;return (60+l*Math.cos(r)).toFixed(1)+" "+(60+l*Math.sin(r)).toFixed(1)};
+ for(i=1;i<=12;i++){var r=(i*30-90)*Math.PI/180;t+="<text x='"+(60+43*Math.cos(r)).toFixed(1)+"' y='"+(64+43*Math.sin(r)).toFixed(1)+"' font-size='11' font-weight='800' text-anchor='middle' fill='#1b1740'>"+i+"</text>"}
+ return "<svg viewBox='0 0 120 120' width='118' height='118' style='display:block;margin:4px auto' role='img' aria-label='Jam analog'><circle cx='60' cy='60' r='56' fill='#fff' stroke='#1b1740' stroke-width='4'/>"+t+"<path d='M60 60L"+hx(a,28)+"' stroke='#1b1740' stroke-width='6' stroke-linecap='round'/><path d='M60 60L"+hx(b,42)+"' stroke='#e0263f' stroke-width='3.5' stroke-linecap='round'/><circle cx='60' cy='60' r='4' fill='#1b1740'/></svg>"}
+function qJm(L){var h=rnd(1,12),M=[[0,30],[0,15,30,45],[0,5,10,15,20,25,30,35,40,45,50,55]][L],m=M[rnd(0,M.length-1)],ans,o;
+ if(L>0&&Math.random()<(L===2?.5:.35)){var d=L===1?rnd(1,5):rnd(2,9),dm=L===2?[0,30][rnd(0,1)]:0,sh=rnd(6,12),em=dm,eh=sh+d,ans2=du(d,dm),tt=function(x){return x>12?x:x};
+  var cs=[du(d+1,dm),du(d-1,dm),du(d,dm?0:30),du(d+2,dm)];cs=cs.filter(function(v,i){return v!==ans2&&cs.indexOf(v)===i&&v.charAt(0)!=="0"});
+  return mk("jm","<small>Jam & waktu</small>Warung buka pukul "+tm(sh,0)+" dan tutup pukul "+tm(eh,dm)+". Berapa lama warung buka?",ans2,shuffle([ans2].concat(shuffle(cs).slice(0,3))),"Dari "+tm(sh,0)+" sampai "+tm(eh,dm)+" = <b>"+ans2+"</b>")}
+ ans=tm(h,m);var ca=[tm(h,(m+15)%60),tm(h,(m+30)%60),tm(h%12+1,m),tm((h+10)%12+1,m),tm(m===0?12:m/5,(h*5)%60),tm(h,(m+5)%60)];
+ ca=ca.filter(function(v,i){return v!==ans&&ca.indexOf(v)===i});
+ return mk("jm","<small>Jam & waktu</small>"+clk(h,m)+"Pukul berapa yang ditunjukkan jam di atas?",ans,shuffle([ans].concat(shuffle(ca).slice(0,3))),"Jarum pendek menunjuk angka "+h+", jarum panjang menunjuk angka "+(m/5)+". Jadi pukul <b>"+ans+"</b>.")}
+var UN=[["kg","g",1000],["m","cm",100],["km","m",1000],["liter","mL",1000],["jam","menit",60],["menit","detik",60]];
+function qSa(L){var u=UN[L===0?[0,1,4][rnd(0,2)]:rnd(0,5)],n,x;
+ if(L===0){n=rnd(1,5);x=n*u[2];return mk("sa","<small>Satuan ukuran</small>"+n+" "+u[0]+" = … "+u[1],fn(x)+" "+u[1],oN(x,[x*10,x/10,x*100,n*10],function(v){return fn(v)+" "+u[1]}),"1 "+u[0]+" = "+fn(u[2])+" "+u[1]+", jadi "+n+" "+u[0]+" = <b>"+fn(x)+" "+u[1]+"</b>")}
+ if(L===1){n=[1.5,2.5,0.5,3,4,2][rnd(0,5)];x=n*u[2];return mk("sa","<small>Satuan ukuran</small>"+fn(n)+" "+u[0]+" = … "+u[1],fn(x)+" "+u[1],oN(x,[x*10,x/10,x*100,x+u[2]/2],function(v){return fn(v)+" "+u[1]}),"1 "+u[0]+" = "+fn(u[2])+" "+u[1]+", jadi "+fn(n)+" "+u[0]+" = <b>"+fn(x)+" "+u[1]+"</b>")}
+ if(Math.random()<.5){n=[1.5,2.5,0.5,3.5,4.5,2,3][rnd(0,6)];x=n*u[2];return mk("sa","<small>Satuan ukuran</small>"+fn(x)+" "+u[1]+" = … "+u[0],fn(n)+" "+u[0],oN(n,[n*10,n/10,n*100,n/100],function(v){return fn(v)+" "+u[0]}),fn(x)+" "+u[1]+" ÷ "+fn(u[2])+" = <b>"+fn(n)+" "+u[0]+"</b>")}
+ var a=rnd(1,3),b=[250,500,750][rnd(0,2)];x=a*1000+b;return mk("sa","<small>Satuan ukuran</small>"+who()+" membeli "+a+" kg gula dan "+b+" g tepung. Berapa gram belanjaannya semua?",fn(x)+" g",oN(x,[a+b,x+500,x-500,a*100+b,x*10],function(v){return fn(v)+" g"}),a+" kg = "+fn(a*1000)+" g<br>"+fn(a*1000)+" g + "+b+" g = <b>"+fn(x)+" g</b>","sm")}
+function qUj(L){if(L===0)return qHg(0);
+ if(L===2&&Math.random()<.55){var P=[20000,40000,50000,60000,80000,100000][rnd(0,5)],pc=[10,20,25,50][rnd(0,3)],d=P*pc/100,x=P-d,i=["sepatu","tas","baju","buku cerita","topi"][rnd(0,4)];
+  return mk("uj","<small>Untung & diskon</small>"+i+" seharga "+rp(P)+" mendapat diskon "+pc+"%. Berapa harga yang harus dibayar?",rp(x),oN(x,[d,P+d,P-d/2,x+1000,x-1000],rp),pc+"% × "+rp(P)+" = "+rp(d)+"<br>"+rp(P)+" − "+rp(d)+" = <b>"+rp(x)+"</b>")}
+ var b=[20000,30000,40000,50000][rnd(0,3)]*(L===2?2:1),dd=[2000,3000,5000,10000][rnd(0,3)]*(L===2?2:1),up=Math.random()<.5,j=up?b+dd:b-dd,ans=(up?"Untung ":"Rugi ")+rp(dd);
+ return mk("uj","<small>Untung & diskon</small>Pak Dedi membeli sebuah jam seharga "+rp(b)+" lalu menjualnya "+rp(j)+". Hasilnya untung atau rugi, dan berapa?",ans,uo(ans,[(up?"Rugi ":"Untung ")+rp(dd),"Untung "+rp(j),"Rugi "+rp(b),"Untung "+rp(b),"Rugi "+rp(j),"Untung "+rp(dd*2)]),"Dijual "+rp(j)+(up?" lebih besar":" lebih kecil")+" dari beli "+rp(b)+", jadi <b>"+ans+"</b>.","sm")}
+function gen(){var n=0,q,w;
+ do{w=S.weak.length&&Math.random()<.35;
+  if(w){q=Object.assign({},S.weak[rnd(0,S.weak.length-1)]);q.opts=shuffle(q.opts.slice())}else q=[qHg,qKb,qNu,qJm,qSa,qUj][rnd(0,5)](S.lv);n++}
+ while(n<40&&S.seen.slice(w?-4:0).indexOf(q.key)>-1);
+ S.seen.push(q.key);if(S.seen.length>30)S.seen.shift();return q}
+
+/* ---------- tampilan ---------- */
+function monI(){return DM[S.lv*3+S.mi]}
+function mS(m){var b=S.mi===2;return wSVG(S.lv*3+S.mi,m,b?160:130,b)}
+function react(ok){var m=document.getElementById("mon"),a=document.getElementById("arena");if(!m)return;m.innerHTML=mS(ok?"sad":"laugh");
+ var L=ok?["Aduh! 😭","Ampun... 🥺","Sakit! 😖","Huhu... 😢"]:["Hahaha! 😆","Salah dong~ 🤪","Hihihi! 😜","Yee, meleset! 😝"],t=L[rnd(0,3)];
+ say(t,ok);pal(ok);
+ if(a){var b=document.createElement("div");b.className="bub";b.textContent=t;a.appendChild(b);setTimeout(function(){b.remove()},1500);
+  (ok?["💧","😢","💧"]:["😂","🤣","😂"]).forEach(function(e){var s=document.createElement("span");s.className="fx";s.textContent=e;s.style.left=rnd(38,58)+"%";s.style.top=ok?"40%":"30%";
+   s.style.setProperty("--dx",rnd(-40,40)+"px");s.style.setProperty("--dy",(ok?rnd(50,90):rnd(-80,-40))+"px");a.appendChild(s);setTimeout(function(){s.remove()},750)})}
+ if(ok)setTimeout(function(){m.classList.remove("hit");m.classList.add("sad")},450);else m.classList.add("laugh")}
+function menu(){document.documentElement.dataset.game="wr";
+ var shelf=DM.map(function(m,j){var on=S.got.indexOf(j)>-1;return '<div class="cw"><div class="slot '+(on?'on':'off')+'">'+wSVG(j,"idle",38,j%3===2)+'</div><small>'+(on?DN[j]:"???")+'</small></div>'}).join("");
+ var bars=CAT.map(function(c){var d=ST.c[c[0]]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;return '<div class="row"><span>'+c[1]+'</span><span class="soft">'+(d[0]?p+'% ('+d[1]+'/'+d[0]+')':'belum ada')+'</span></div><div class="meter"><i style="width:'+p+'%"></i></div>'}).join("");
+ app.innerHTML='<div class="top"><button id="hb">← Kampung</button><button class="ib" id="mu" aria-label="Suara" title="Suara">'+(MUTE?ICO.off:ICO.on)+'</button></div><h1>Warung Si Monster</h1>'+
+ '<p class="soft">Pencuri koin mengincar warungmu! Hitung uang dan waktu dengan benar untuk menjaganya.</p>'+
+ LVN.map(function(n,i){return '<button class="lv" data-lv="'+i+'"><span>'+n+'<small>'+LVD[i]+'</small></span><span>🛒</span></button>'}).join("")+
+ '<p><b>Koleksi pencuri koin</b> <span class="soft">('+S.got.length+'/9)</span></p><div class="shelf">'+shelf+'</div>'+
+ '<h2>Buku kas warung</h2><div class="card">'+bars+'</div>';
+ document.getElementById("hb").onclick=hub;document.getElementById("mu").onclick=function(){MUTE=!MUTE;sv("pa-mute",MUTE);snd("tap");menu()};
+ app.querySelectorAll("[data-lv]").forEach(function(b){b.onclick=function(){snd("tap");S.lv=+b.dataset.lv;S.mi=0;S.hp=5;S.weak=[];monster()}});
+}
+function monster(){S.mx=S.mi===2?5:3;S.mhp=S.mx;next()}
+function next(){S.q=gen();S.busy=false;battle()}
+function battle(){var q=S.q,lg=q.opts.some(function(o){return o.length>6});
+ app.innerHTML='<div class="top"><button id="x">← Menu</button><span class="soft">Pencuri '+(S.mi+1)+'/3</span><span class="hearts" aria-label="Nyawa '+S.hp+'">'+"❤️".repeat(S.hp)+"🖤".repeat(5-S.hp)+'</span></div>'+
+ '<div class="arena" id="arena"><div class="mon" id="mon">'+mS(S.mhp===1?"nerv":"idle")+'</div>'+(FAV()>=0?'<div class="pal" id="pal">'+ally("idle")+'</div>':'')+'<div><b>'+(S.mi===2?'BOS ':'')+DN[S.lv*3+S.mi]+'</b></div><div class="bar"><i style="width:'+(S.mhp/S.mx*100)+'%"></i></div>'+
+ '<div class="q '+q.sz+'">'+q.text+'</div></div>'+
+ '<div class="opts">'+q.opts.map(function(o){return '<button'+(lg?' class="long"':'')+' data-v="'+esc(o)+'">'+esc(o)+'</button>'}).join("")+'</div><div id="fb"></div>';
+ document.getElementById("x").onclick=menu;
+ app.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){pick(b)}});
+}
+function pick(btn){if(S.busy)return;S.busy=true;
+ var q=S.q,ok=btn.dataset.v===q.ans,mon=document.getElementById("mon"),fb=document.getElementById("fb"),d=ST.c[q.t]=ST.c[q.t]||[0,0],day=dk(new Date());
+ d[0]++;if(ok)d[1]++;ST.days[day]=(ST.days[day]||0)+1;sv("pa-wrstat",ST);
+ app.querySelectorAll("[data-v]").forEach(function(b){if(b.dataset.v===q.ans)b.classList.add("ok")});
+ if(ok){snd("ok");burst();mon.classList.add("hit");react(true);S.mhp--;fb.innerHTML='<div class="fb"><b>Kena! 💥</b></div>';
+  if(S.mhp<=0)setTimeout(function(){mon.classList.add("win");setTimeout(defeated,800)},900);else setTimeout(next,1500);
+ }else{snd("no");react(false);document.getElementById("arena").classList.add("shake");btn.classList.add("no");S.hp--;
+  if(!S.weak.some(function(w){return w.key===q.key}))S.weak.push(q);
+  fb.innerHTML='<div class="fb"><b>Cara menghitung:</b>'+q.ex+'</div><div class="center"><button class="go" id="c">'+(S.hp>0?"Lanjut":"Lihat hasil")+'</button></div>';
+  document.getElementById("c").onclick=function(){S.hp>0?next():over()};
+ }}
+function defeated(){var j=S.lv*3+S.mi,b=S.mi===2;
+ if(S.got.indexOf(j)<0){S.got.push(j);sv("pa-wrkoleksi",S.got)}
+ snd("win");
+ if(b){confetti();app.innerHTML='<div class="center"><h1>Warung aman! 🎉</h1><p>Semua pencuri koin di level '+LVN[S.lv]+' sudah tertangkap.</p><div class="mon" style="animation:none">'+wSVG(j,"sad",140,true)+'</div><p class="soft">'+(S.weak.length?"Perlu dilatih lagi: "+S.weak.slice(0,3).map(function(w){return CAT.filter(function(c){return c[0]===w.t})[0][1]}).join(", ")+".":"Tanpa salah sama sekali. Hebat!")+'</p><button class="go" id="m">Kembali ke menu</button></div>';
+  document.getElementById("m").onclick=menu}
+ else{app.innerHTML='<div class="center"><div class="mon" style="animation:none">'+wSVG(j,"sad",110,false)+'</div><h1>'+DN[j]+' kalah!</h1><p>Pencuri koin masuk koleksimu. Siap lawan berikutnya?</p><button class="go" id="n">Lanjut bertarung</button></div>';
+  document.getElementById("n").onclick=function(){S.mi++;monster()}}}
+function over(){app.innerHTML='<div class="center"><div class="mon" style="animation:none">'+mS("laugh")+'</div><h1>Nyawa habis 😴</h1><p>Tidak apa-apa, penjaga warung hebat pun perlu istirahat. Soal yang tadi sulit akan muncul lagi.</p><button class="go" id="r">Coba lagi</button> <button id="m">Menu</button></div>';
+ document.getElementById("r").onclick=function(){S.hp=5;monster()};document.getElementById("m").onclick=menu}
+
+return{menu:menu,load:load,stat:function(){return ST},got:function(){return S.got},cat:CAT}})();
+function FAV(){return S.fav}
+function dn(D){var n=0;for(var k in D.c)n+=D.c[k][0];return n}
+function dkRows(D){return DK.cat.map(function(c){var d=D.c[c[0]]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;
+ return '<div class="card"><div class="row"><b>'+c[1]+'</b><span class="soft">'+status(d[0],p)+'</span></div><div class="meter"><i style="width:'+p+'%"></i></div><span class="soft">'+d[1]+' benar dari '+d[0]+' soal'+(d[0]?' ('+p+'%)':'')+'</span></div>'}).join("")}
+function dkTip(D){var w=null;DK.cat.forEach(function(c){var d=D.c[c[0]]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;if(d[0]>=10&&p<85&&(!w||p<w.p))w={n:c[1],p:p}});
+ return w?'<p>Bahasa: ajak ananda berlatih '+w.n.toLowerCase()+' ('+w.p+'% benar) di Detektif Kata.</p>':''}
+function wrRows(D){return WR.cat.map(function(c){var d=D.c[c[0]]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;
+ return '<div class="card"><div class="row"><b>'+c[1]+'</b><span class="soft">'+status(d[0],p)+'</span></div><div class="meter"><i style="width:'+p+'%"></i></div><span class="soft">'+d[1]+' benar dari '+d[0]+' soal'+(d[0]?' ('+p+'%)':'')+'</span></div>'}).join("")}
+function wrTip(D){var w=null;WR.cat.forEach(function(c){var d=D.c[c[0]]||[0,0],p=d[0]?Math.round(d[1]/d[0]*100):0;if(d[0]>=10&&p<85&&(!w||p<w.p))w={n:c[1],p:p}});
+ return w?'<p>Uang & waktu: ajak ananda berlatih '+w.n.toLowerCase()+' ('+w.p+'% benar) di Warung Si Monster.</p>':''}
+function hub(){document.documentElement.dataset.game="";if(PF.list.length>1&&!PICKED){picker();return}
+ app.innerHTML='<div class="top"><h1>Kampung Monster</h1><span><button class="ib" id="mu" aria-label="Suara" title="Suara">'+(MUTE?ICO.off:ICO.on)+'</button> <button class="ib" id="pr" aria-label="Orang tua" title="Orang tua">'+ICO.par+'</button></span></div>'+
+ (PF.list.length>1?'<button class="chip" id="chip"><span class="slot on">'+monSVG(avOf(cp()),"idle",26,avOf(cp())%3===2)+'</span><b>'+xe(cp().name)+'</b> <span class="soft">ganti</span></button>':'')+
+ '<p class="soft">Pilih permainan. Monster dari semua permainan jadi koleksimu.</p>'+
+ '<button class="lv gc ga" id="ga"><span><b>Petualangan Angka</b><small>Berhitung: kali, tambah, kurang, bagi</small><small>'+S.got.length+'/36 monster</small></span><span>'+monSVG(3,"idle",58,false)+'</span></button>'+
+ '<button class="lv gc gd" id="gd"><span><b>Detektif Kata</b><small>Bahasa Indonesia: ejaan, imbuhan, bacaan</small><small>'+DK.got().length+'/9 pencuri kata</small></span><span>'+dkSVG(0,"idle",58,false)+'</span></button>'+
+ '<button class="lv gc gw" id="gw"><span><b>Warung Si Monster</b><small>Uang, jam, dan ukuran sehari-hari</small><small>'+WR.got().length+'/9 pencuri koin</small></span><span>'+wSVG(0,"idle",58,false)+'</span></button>';
+ document.getElementById("ga").onclick=function(){snd("tap");menu()};
+ document.getElementById("gd").onclick=function(){snd("tap");DK.menu()};
+ document.getElementById("gw").onclick=function(){snd("tap");WR.menu()};
+ document.getElementById("mu").onclick=function(){MUTE=!MUTE;sv("pa-mute",MUTE);snd("tap");hub()};
+ document.getElementById("pr").onclick=parent;var ch=document.getElementById("chip");if(ch)ch.onclick=picker}
+hub();
 </script>
 <script>if("serviceWorker" in navigator&&location.protocol!=="file:"){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}</script>
 </body>

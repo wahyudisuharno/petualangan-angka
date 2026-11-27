@@ -1,25 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
 <defs>
-<radialGradient id="bg" cx="50%" cy="30%" r="85%"><stop offset="0" stop-color="#8f7bff"/><stop offset="1" stop-color="#2f2397"/></radialGradient>
-<linearGradient id="bd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd95a"/><stop offset="1" stop-color="#ff9a1a"/></linearGradient>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b57ff"/><stop offset=".55" stop-color="#3a2bb8"/><stop offset="1" stop-color="#0f9d90"/></linearGradient>
+<linearGradient id="or" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd95a"/><stop offset="1" stop-color="#ff9a1a"/></linearGradient>
+<linearGradient id="gh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c58bff"/><stop offset="1" stop-color="#8a4fe0"/></linearGradient>
 </defs>
 <rect width="512" height="512" fill="url(#bg)"/>
-<circle cx="256" cy="470" r="230" fill="#ffffff" opacity=".07"/>
-<g fill="#ffe27a" stroke="#fff" stroke-width="3" stroke-linejoin="round" opacity=".95">
-<g transform="translate(122 132) rotate(45)"><rect x="-26" y="-6" width="52" height="12" rx="6"/><rect x="-6" y="-26" width="12" height="52" rx="6"/></g>
-<g transform="translate(392 132)"><rect x="-26" y="-6" width="52" height="12" rx="6"/><rect x="-6" y="-26" width="12" height="52" rx="6"/></g>
-<g transform="translate(114 396)"><rect x="-26" y="-6" width="52" height="12" rx="6"/></g>
-<g transform="translate(398 396)"><rect x="-24" y="-5" width="48" height="10" rx="5"/><circle cy="-20" r="7"/><circle cy="20" r="7"/></g>
+<circle cx="256" cy="480" r="240" fill="#fff" opacity=".07"/>
+<!-- simbol -->
+<g fill="#ffe27a" stroke="#fff" stroke-width="3" opacity=".95">
+<g transform="translate(112 122)"><rect x="-22" y="-5" width="44" height="10" rx="5"/><rect x="-5" y="-22" width="10" height="44" rx="5"/></g>
+<g transform="translate(206 100) rotate(45)"><rect x="-22" y="-5" width="44" height="10" rx="5"/><rect x="-5" y="-22" width="10" height="44" rx="5"/></g>
 </g>
-<path d="M186 190L168 118L228 168Z M326 190L344 118L284 168Z" fill="#fff4bf" stroke="#8a4b00" stroke-width="9" stroke-linejoin="round"/>
+<!-- hantu ungu (Detektif Kata) -->
+<g transform="translate(236 86) scale(1.5)">
+<ellipse cx="100" cy="182" rx="40" ry="6" fill="#000" opacity=".18"/>
+<path d="M44 170V100Q44 44 100 44Q156 44 156 100V170L134 154L116 172L100 154L84 172L66 154Z" fill="url(#gh)" stroke="#4a2486" stroke-width="5" stroke-linejoin="round"/>
+<ellipse cx="80" cy="68" rx="16" ry="8" fill="#fff" opacity=".4" transform="rotate(-25 80 68)"/>
+<circle cx="80" cy="106" r="12" fill="#fff" stroke="#2a1a4a" stroke-width="3"/><circle cx="120" cy="106" r="12" fill="#fff" stroke="#2a1a4a" stroke-width="3"/>
+<circle cx="82" cy="109" r="6" fill="#2a1a4a"/><circle cx="118" cy="109" r="6" fill="#2a1a4a"/>
+<path d="M84 128Q100 144 116 128" fill="none" stroke="#2a1a4a" stroke-width="4.5" stroke-linecap="round"/>
+<path d="M62 56Q100 6 138 56Z" fill="#8a5a2b" stroke="#4a2f12" stroke-width="4" stroke-linejoin="round"/>
+<rect x="71" y="38" width="58" height="7" fill="#e9c46a"/>
+<ellipse cx="100" cy="56" rx="48" ry="7" fill="#a86f3a" stroke="#4a2f12" stroke-width="4"/>
+</g>
+<!-- monster oranye (Petualangan Angka) -->
+<g transform="translate(-14 118) scale(.78)">
 <ellipse cx="190" cy="388" rx="40" ry="22" fill="#8a4b00"/><ellipse cx="322" cy="388" rx="40" ry="22" fill="#8a4b00"/>
-<ellipse cx="256" cy="268" rx="132" ry="118" fill="url(#bd)" stroke="#8a4b00" stroke-width="10"/>
+<path d="M186 190L168 118L228 168Z M326 190L344 118L284 168Z" fill="#fff4bf" stroke="#8a4b00" stroke-width="10" stroke-linejoin="round"/>
+<ellipse cx="256" cy="268" rx="132" ry="118" fill="url(#or)" stroke="#8a4b00" stroke-width="11"/>
 <ellipse cx="206" cy="196" rx="46" ry="18" fill="#fff" opacity=".45" transform="rotate(-20 206 196)"/>
-<g stroke="#2a1a4a" stroke-width="7">
-<circle cx="206" cy="246" r="34" fill="#fff"/><circle cx="306" cy="246" r="34" fill="#fff"/></g>
+<g stroke="#2a1a4a" stroke-width="8"><circle cx="206" cy="246" r="34" fill="#fff"/><circle cx="306" cy="246" r="34" fill="#fff"/></g>
 <circle cx="212" cy="252" r="16" fill="#2a1a4a"/><circle cx="300" cy="252" r="16" fill="#2a1a4a"/>
 <circle cx="206" cy="244" r="6" fill="#fff"/><circle cx="294" cy="244" r="6" fill="#fff"/>
 <circle cx="170" cy="304" r="15" fill="#ff7a9c" opacity=".55"/><circle cx="342" cy="304" r="15" fill="#ff7a9c" opacity=".55"/>
-<path d="M214 296Q256 372 298 296Z" fill="#4a1030" stroke="#2a1a4a" stroke-width="7" stroke-linejoin="round"/>
+<path d="M214 296Q256 372 298 296Z" fill="#4a1030" stroke="#2a1a4a" stroke-width="8" stroke-linejoin="round"/>
 <ellipse cx="256" cy="330" rx="22" ry="11" fill="#ff7a9c"/>
+</g>
+<!-- kaca pembesar -->
+<g transform="translate(330 330)">
+<path d="M26 26L66 66" stroke="#7a4a12" stroke-width="16" stroke-linecap="round"/>
+<path d="M26 26L66 66" stroke="#e9a13b" stroke-width="8" stroke-linecap="round"/>
+<circle r="40" fill="#cfeeff" fill-opacity=".35" stroke="#ffd23f" stroke-width="12"/>
+<circle r="40" fill="none" stroke="#a86f00" stroke-width="3" opacity=".6"/>
+<path d="M-17 15L0 -22L17 15M-9 3H9" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
 </svg>

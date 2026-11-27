@@ -1,7 +1,7 @@
 {
- "name": "Petualangan Angka",
- "short_name": "Angka",
- "description": "Game berhitung seru untuk anak SD: kalahkan monster dengan kali, tambah, kurang, dan bagi.",
+ "name": "Kampung Monster",
+ "short_name": "Monster",
+ "description": "Belajar seru bersama monster: berhitung, Bahasa Indonesia, serta uang dan waktu.",
  "lang": "id",
  "start_url": "./index.html",
  "scope": "./",
